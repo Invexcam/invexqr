@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import QRCodeDisplay from "@/components/ui/qr-code";
+import QRCodeDisplay from "@/components/ui/qr-code-display";
 import QRDownloadButton from "@/components/qr-download-button";
 import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
 
