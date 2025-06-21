@@ -118,6 +118,111 @@ Contact: contact@invexqr.com`,
     });
   }
 
+  async sendQRCodeCreatedEmail(userEmail: string, userName: string, qrCodeName: string, qrCodeUrl: string): Promise<boolean> {
+    const html = `
+      <h2>QR Code créé avec succès !</h2>
+      <p>Bonjour ${userName},</p>
+      <p>Votre QR Code "<strong>${qrCodeName}</strong>" a été créé avec succès sur InvexQR.</p>
+      <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <h3>Détails du QR Code :</h3>
+        <p><strong>Nom :</strong> ${qrCodeName}</p>
+        <p><strong>URL de redirection :</strong> ${qrCodeUrl}</p>
+        <p><strong>Date de création :</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
+      </div>
+      <p>Vous pouvez maintenant partager votre QR Code et suivre ses performances dans votre dashboard.</p>
+      <p>Cordialement,<br>L'équipe InvexQR</p>
+      <hr>
+      <p><small>Contact: contact@invexqr.com</small></p>
+    `;
+
+    return await this.sendEmail({
+      to: userEmail,
+      subject: `QR Code créé : ${qrCodeName}`,
+      html,
+      text: `QR Code créé avec succès !
+
+Bonjour ${userName},
+
+Votre QR Code "${qrCodeName}" a été créé avec succès.
+URL de redirection : ${qrCodeUrl}
+Date de création : ${new Date().toLocaleDateString('fr-FR')}
+
+Consultez votre dashboard pour suivre ses performances.
+
+Cordialement,
+L'équipe InvexQR`,
+    });
+  }
+
+  async sendQRCodeScannedEmail(userEmail: string, userName: string, qrCodeName: string, scanLocation: string): Promise<boolean> {
+    const html = `
+      <h2>Nouveau scan de QR Code !</h2>
+      <p>Bonjour ${userName},</p>
+      <p>Votre QR Code "<strong>${qrCodeName}</strong>" vient d'être scanné.</p>
+      <div style="background-color: #f0f9ff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <h3>Détails du scan :</h3>
+        <p><strong>QR Code :</strong> ${qrCodeName}</p>
+        <p><strong>Localisation :</strong> ${scanLocation}</p>
+        <p><strong>Date et heure :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+      </div>
+      <p>Consultez votre dashboard pour voir toutes les statistiques détaillées.</p>
+      <p>Cordialement,<br>L'équipe InvexQR</p>
+      <hr>
+      <p><small>Contact: contact@invexqr.com</small></p>
+    `;
+
+    return await this.sendEmail({
+      to: userEmail,
+      subject: `QR Code scanné : ${qrCodeName}`,
+      html,
+      text: `Nouveau scan de QR Code !
+
+Bonjour ${userName},
+
+Votre QR Code "${qrCodeName}" vient d'être scanné.
+Localisation : ${scanLocation}
+Date et heure : ${new Date().toLocaleString('fr-FR')}
+
+Consultez votre dashboard pour les statistiques détaillées.
+
+Cordialement,
+L'équipe InvexQR`,
+    });
+  }
+
+  async sendActionNotificationEmail(userEmail: string, userName: string, action: string, details: string): Promise<boolean> {
+    const html = `
+      <h2>Action effectuée sur InvexQR</h2>
+      <p>Bonjour ${userName},</p>
+      <p>Une action a été effectuée sur votre compte InvexQR :</p>
+      <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <h3>Détails de l'action :</h3>
+        <p><strong>Action :</strong> ${action}</p>
+        <p><strong>Détails :</strong> ${details}</p>
+        <p><strong>Date et heure :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+      </div>
+      <p>Cordialement,<br>L'équipe InvexQR</p>
+      <hr>
+      <p><small>Contact: contact@invexqr.com</small></p>
+    `;
+
+    return await this.sendEmail({
+      to: userEmail,
+      subject: `Action effectuée : ${action}`,
+      html,
+      text: `Action effectuée sur InvexQR
+
+Bonjour ${userName},
+
+Action : ${action}
+Détails : ${details}
+Date et heure : ${new Date().toLocaleString('fr-FR')}
+
+Cordialement,
+L'équipe InvexQR`,
+    });
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       await this.transporter.verify();

@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFirebaseAuth } from "./useFirebaseAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useRef } from "react";
 
 export function useAuth() {
   const { user: firebaseUser, loading: firebaseLoading } = useFirebaseAuth();
+  const { toast } = useToast();
+  const hasShownWelcome = useRef(false);
   
   const { data: replitUser, isLoading: replitLoading } = useQuery({
     queryKey: ["/api/auth/user"],
@@ -21,11 +25,32 @@ export function useAuth() {
   } : replitUser;
 
   const isLoading = firebaseLoading || (replitLoading && !firebaseUser);
+  const isAuthenticated = !!user;
+
+  // Show welcome message on authentication
+  useEffect(() => {
+    if (isAuthenticated && user && !hasShownWelcome.current) {
+      hasShownWelcome.current = true;
+      
+      const firstName = user.firstName || user.email?.split('@')[0] || 'Utilisateur';
+      
+      toast({
+        title: "Bienvenue sur InvexQR !",
+        description: `Bonjour ${firstName}, vous êtes maintenant connecté(e) à votre dashboard.`,
+        duration: 5000,
+      });
+    }
+    
+    // Reset welcome flag when user logs out
+    if (!isAuthenticated) {
+      hasShownWelcome.current = false;
+    }
+  }, [isAuthenticated, user, toast]);
 
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated,
     authProvider: firebaseUser ? 'firebase' : 'replit',
   };
 }

@@ -155,6 +155,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const qrCode = await storage.createQRCode(userId, qrData);
+      
+      // Send email notification for QR code creation
+      try {
+        const user = await storage.getUser(userId);
+        if (user && user.email) {
+          const userName = user.firstName || user.email.split('@')[0];
+          await emailService.sendQRCodeCreatedEmail(
+            user.email, 
+            userName, 
+            qrData.name, 
+            qrData.originalUrl
+          );
+          
+          // Also send general action notification
+          await emailService.sendActionNotificationEmail(
+            user.email,
+            userName,
+            "Création de QR Code",
+            `QR Code "${qrData.name}" créé avec succès`
+          );
+        }
+      } catch (emailError) {
+        console.error("Failed to send QR code creation email:", emailError);
+        // Don't fail the request if email fails
+      }
+      
       res.status(201).json(qrCode);
     } catch (error) {
       console.error("Error creating QR code:", error);
@@ -175,6 +201,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const updateData = insertQRCodeSchema.partial().parse(req.body);
       const updatedQR = await storage.updateQRCode(id, updateData);
+      
+      // Send email notification for QR code update
+      try {
+        const user = await storage.getUser(userId);
+        if (user && user.email) {
+          const userName = user.firstName || user.email.split('@')[0];
+          await emailService.sendActionNotificationEmail(
+            user.email,
+            userName,
+            "Modification de QR Code",
+            `QR Code "${existingQR.name}" modifié avec succès`
+          );
+        }
+      } catch (emailError) {
+        console.error("Failed to send QR code update email:", emailError);
+      }
       
       res.json(updatedQR);
     } catch (error) {
@@ -200,6 +242,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const deleted = await storage.deleteQRCode(id);
       if (deleted) {
+        // Send email notification for QR code deletion
+        try {
+          const user = await storage.getUser(userId);
+          if (user && user.email) {
+            const userName = user.firstName || user.email.split('@')[0];
+            await emailService.sendActionNotificationEmail(
+              user.email,
+              userName,
+              "Suppression de QR Code",
+              `QR Code "${existingQR.name}" supprimé avec succès`
+            );
+          }
+        } catch (emailError) {
+          console.error("Failed to send QR code deletion email:", emailError);
+        }
+        
         res.json({ message: "QR code deleted successfully" });
       } else {
         res.status(500).json({ message: "Failed to delete QR code" });
