@@ -47,6 +47,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
     container_name: invexqr_app
     restart: unless-stopped
     environment:
