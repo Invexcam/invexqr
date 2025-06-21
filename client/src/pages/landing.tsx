@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { QrCode, BarChart3, Link, Palette, Shield, Code, Users, TrendingUp } from "lucide-react";
+import { QrCode, BarChart3, Link, Palette, Shield, Code, Users, TrendingUp, Menu, X } from "lucide-react";
 import AuthModal from "@/components/auth/auth-modal";
 import PublicQRGenerator from "@/components/public-qr-generator";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function Landing() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateQR, setShowCreateQR] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Fetch public statistics with auto-refresh every 30 seconds
   const { data: stats, isLoading } = useQuery({
@@ -19,10 +20,16 @@ export default function Landing() {
 
   const handleLogin = () => {
     setShowAuthModal(true);
+    setMobileMenuOpen(false);
   };
 
   const handleCreateQR = () => {
     setShowCreateQR(true);
+    setMobileMenuOpen(false);
+  };
+
+  const handleLinkClick = () => {
+    setMobileMenuOpen(false);
   };
 
   const features = [
@@ -93,13 +100,45 @@ export default function Landing() {
                 Get Started
               </Button>
             </div>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </Button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white border-b shadow-lg z-50">
+            <div className="px-4 py-6 space-y-4">
+              <a href="#features" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                Features
+              </a>
+              <a href="#pricing" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                Pricing
+              </a>
+              <a href="/contact" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
+                Contact
+              </a>
+              <div className="pt-4 border-t space-y-3">
+                <Button variant="ghost" onClick={handleLogin} className="w-full justify-start text-primary hover:text-primary/90">
+                  Login
+                </Button>
+                <Button onClick={handleLogin} className="w-full bg-primary hover:bg-primary/90">
+                  Get Started
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -160,7 +199,7 @@ export default function Landing() {
                         <div>
                           <div className="text-xs text-muted-foreground">Total Scans</div>
                           <div className="text-lg font-bold text-foreground">
-                            {isLoading ? "..." : (stats?.totalScans?.toLocaleString() || "0")}
+                            {isLoading ? "..." : ((stats as any)?.totalScans?.toLocaleString() || "0")}
                           </div>
                         </div>
                       </div>
@@ -177,7 +216,7 @@ export default function Landing() {
                         <div>
                           <div className="text-xs text-muted-foreground">QR Codes Generated</div>
                           <div className="text-lg font-bold text-foreground">
-                            {isLoading ? "..." : (stats?.totalQRCodes?.toLocaleString() || "0")}
+                            {isLoading ? "..." : ((stats as any)?.totalQRCodes?.toLocaleString() || "0")}
                           </div>
                         </div>
                       </div>
@@ -197,7 +236,7 @@ export default function Landing() {
                         <div>
                           <div className="text-xs text-muted-foreground">Active Users</div>
                           <div className="text-lg font-bold text-foreground">
-                            {isLoading ? "..." : (stats?.totalUsers?.toLocaleString() || "0")}
+                            {isLoading ? "..." : ((stats as any)?.totalUsers?.toLocaleString() || "0")}
                           </div>
                         </div>
                       </div>
