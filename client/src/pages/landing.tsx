@@ -3,12 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QrCode, BarChart3, Link, Palette, Shield, Code } from "lucide-react";
 import AuthModal from "@/components/auth/auth-modal";
+import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
 
 export default function Landing() {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCreateQR, setShowCreateQR] = useState(false);
 
   const handleLogin = () => {
     setShowAuthModal(true);
+  };
+
+  const handleCreateQR = () => {
+    setShowCreateQR(true);
   };
 
   const features = [
@@ -107,11 +113,9 @@ export default function Landing() {
                 <Button onClick={handleLogin} size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8 py-4">
                   Start Free Trial
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                  </svg>
-                  Watch Demo
+                <Button onClick={handleCreateQR} variant="outline" size="lg" className="text-lg px-8 py-4">
+                  <QrCode className="w-5 h-5 mr-2" />
+                  Create QR Code
                 </Button>
               </div>
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
@@ -217,6 +221,13 @@ export default function Landing() {
 
       {/* Auth Modal */}
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+      
+      {/* Create QR Modal */}
+      <EnhancedCreateQRModal 
+        open={showCreateQR} 
+        onOpenChange={setShowCreateQR}
+        editMode={false}
+      />
     </div>
   );
 }

@@ -54,6 +54,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public QR code creation for visitors
+  app.post('/api/public/qr-codes', async (req, res) => {
+    try {
+      const generateOriginalUrl = (contentType: string, content: any) => {
+        if (contentType === 'url' && content.url) {
+          return content.url;
+        }
+        return `${req.protocol}://${req.get('host')}/qr/${Date.now()}`;
+      };
+
+      const qrData = {
+        name: req.body.name,
+        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content),
+        type: req.body.type || 'static',
+        contentType: req.body.contentType || 'url',
+        content: req.body.content || {},
+        style: req.body.style || {},
+        customization: req.body.customization || {},
+        description: req.body.description,
+      };
+      
+      const qrCode = await storage.createQRCode('anonymous', qrData);
+      res.status(201).json(qrCode);
+    } catch (error) {
+      console.error("Error creating public QR code:", error);
+      res.status(500).json({ message: "Failed to create QR code" });
+    }
+  });
+
   // QR Code routes
   app.get('/api/qr-codes', authenticateUser as any, async (req: any, res) => {
     try {
