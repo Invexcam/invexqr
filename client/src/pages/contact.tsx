@@ -290,7 +290,7 @@ export default function Contact() {
                         id="email"
                         type="email"
                         {...form.register("email")}
-                        placeholder="votre@email.com"
+                        placeholder="your@email.com"
                       />
                       {form.formState.errors.email && (
                         <p className="text-sm text-red-500 mt-1">
@@ -299,7 +299,7 @@ export default function Contact() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="phone">Téléphone</Label>
+                      <Label htmlFor="phone">Phone</Label>
                       <Input
                         id="phone"
                         {...form.register("phone")}
@@ -309,16 +309,16 @@ export default function Contact() {
                   </div>
 
                   <div>
-                    <Label htmlFor="company">Entreprise</Label>
+                    <Label htmlFor="company">Company</Label>
                     <Input
                       id="company"
                       {...form.register("company")}
-                      placeholder="Nom de votre entreprise"
+                      placeholder="Your company name"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="subject">Sujet *</Label>
+                    <Label htmlFor="subject">Subject *</Label>
                     <Select
                       value={form.watch("subject")}
                       onValueChange={(value: any) => form.setValue("subject", value)}
@@ -327,11 +327,11 @@ export default function Contact() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="support">Support technique</SelectItem>
-                        <SelectItem value="sales">Ventes et tarifs</SelectItem>
-                        <SelectItem value="partnership">Partenariat</SelectItem>
-                        <SelectItem value="feedback">Retour d'expérience</SelectItem>
-                        <SelectItem value="other">Autre</SelectItem>
+                        <SelectItem value="support">Technical Support</SelectItem>
+                        <SelectItem value="sales">Sales and Pricing</SelectItem>
+                        <SelectItem value="partnership">Partnership</SelectItem>
+                        <SelectItem value="feedback">Feedback</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -341,7 +341,7 @@ export default function Contact() {
                     <Textarea
                       id="message"
                       {...form.register("message")}
-                      placeholder="Décrivez votre demande en détail..."
+                      placeholder="Describe your request in detail..."
                       rows={5}
                     />
                     {form.formState.errors.message && (
@@ -358,11 +358,11 @@ export default function Contact() {
                     className="w-full"
                   >
                     {isSubmitting ? (
-                      "Envoi en cours..."
+                      "Sending..."
                     ) : (
                       <>
                         <Send className="w-4 h-4 mr-2" />
-                        Envoyer le message
+                        Send Message
                       </>
                     )}
                   </Button>
@@ -384,7 +384,7 @@ export default function Contact() {
               <span className="text-xl font-bold">InvexQR</span>
             </div>
             <p className="text-gray-400">
-              © 2024 InvexQR. Tous droits réservés.
+              © 2024 InvexQR. All rights reserved.
             </p>
           </div>
         </div>
