@@ -16,15 +16,20 @@ export default function Overview({ onCreateClick }: OverviewProps) {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   
-  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+  const { data: analytics = {
+    totalQRCodes: 0,
+    totalScans: 0,
+    scansToday: 0,
+    activeQRCodes: 0
+  }, isLoading: analyticsLoading } = useQuery({
     queryKey: ["/api/analytics/overview"],
   });
 
-  const { data: topPerforming, isLoading: topPerformingLoading } = useQuery({
+  const { data: topPerforming = [], isLoading: topPerformingLoading } = useQuery({
     queryKey: ["/api/analytics/top-performing"],
   });
 
-  const { data: recentQRCodes, isLoading: qrCodesLoading } = useQuery({
+  const { data: recentQRCodes = [], isLoading: qrCodesLoading } = useQuery({
     queryKey: ["/api/qr-codes"],
   });
 

@@ -91,10 +91,11 @@ export const qrScansRelations = relations(qrScans, ({ one }) => ({
 // Schemas
 export const insertQRCodeSchema = createInsertSchema(qrCodes).omit({
   id: true,
-  shortCode: true,
   userId: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  shortCode: z.string().optional(),
 });
 
 export const insertQRScanSchema = createInsertSchema(qrScans).omit({

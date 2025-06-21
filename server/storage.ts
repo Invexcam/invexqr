@@ -150,7 +150,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(qrCodes)
       .where(eq(qrCodes.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Analytics operations
