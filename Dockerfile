@@ -1,40 +1,85 @@
-# Production build for Node.js application
-FROM node:18-alpine AS production
+# Multi-stage build pour optimiser la taille de l'image
+FROM node:20-alpine AS base
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+# Installer les dépendances système
+RUN apk add --no-cache \
+    curl \
+    postgresql-client \
+    && rm -rf /var/cache/apk/*
 
-# Create app directory
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copy package files first
+# Copier les fichiers de configuration
 COPY package*.json ./
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+COPY tailwind.config.ts ./
+COPY postcss.config.js ./
+COPY components.json ./
+COPY drizzle.config.ts ./
 
-# Install ALL dependencies
-RUN npm ci && npm cache clean --force
+# Installer les dépendances
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy application source
+# Stage de développement
+FROM base AS development
+RUN npm ci
+COPY . .
+CMD ["npm", "run", "dev"]
+
+# Stage de build
+FROM base AS build
+RUN npm ci
 COPY . .
 
-# Set NODE_ENV for build
-ENV NODE_ENV=production
-
-# Build the application
+# Build de l'application
 RUN npm run build
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Stage de production
+FROM node:20-alpine AS production
 
-# Set proper working directory and environment
+# Installer les dépendances système pour la production
+RUN apk add --no-cache \
+    curl \
+    postgresql-client \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Créer un utilisateur non-root
+RUN addgroup -g 1001 -S nodejs \
+    && adduser -S nextjs -u 1001
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de production depuis le stage build
+COPY --from=build --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=build --chown=nextjs:nodejs /app/package*.json ./
+COPY --from=build --chown=nextjs:nodejs /app/dist ./dist
+COPY --from=build --chown=nextjs:nodejs /app/server ./server
+COPY --from=build --chown=nextjs:nodejs /app/shared ./shared
+COPY --from=build --chown=nextjs:nodejs /app/drizzle.config.ts ./
+
+# Créer le répertoire des logs
+RUN mkdir -p /app/logs && chown nextjs:nodejs /app/logs
+
+# Changer vers l'utilisateur non-root
+USER nextjs
+
+# Exposer le port
+EXPOSE 5000
+
+# Variables d'environnement par défaut
 ENV NODE_ENV=production
-ENV PORT=3001
-
-# Expose port
-EXPOSE 3001
+ENV PORT=5000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:3001/api/public/stats || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Use tsx to run the TypeScript server directly to avoid compilation issues
-CMD ["npx", "tsx", "server/index.ts"]
+# Utiliser dumb-init comme PID 1
+ENTRYPOINT ["dumb-init", "--"]
+
+# Commande de démarrage
+CMD ["node", "server/index.js"]
