@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QrCode, BarChart3, Link, Palette, Shield, Code } from "lucide-react";
+import AuthModal from "@/components/auth/auth-modal";
 
 export default function Landing() {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   const handleLogin = () => {
-    window.location.href = "/api/login";
+    setShowAuthModal(true);
   };
 
   const features = [
@@ -210,6 +214,9 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
 }
