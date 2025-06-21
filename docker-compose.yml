@@ -17,7 +17,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - invexapps_net
+      - invexqr_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U invexqr_user -d invexqr"]
       interval: 30s
@@ -97,7 +97,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - invexapps_net
+      - invexqr_net
     volumes:
       - ./logs:/app/logs
     healthcheck:
@@ -122,7 +122,7 @@ services:
     depends_on:
       - invexqr
     networks:
-      - invexapps_net
+      - invexqr_net
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
@@ -140,7 +140,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     networks:
-      - invexapps_net
+      - invexqr_net
     profiles:
       - monitoring
 
@@ -156,16 +156,16 @@ services:
       WATCHTOWER_POLL_INTERVAL: 86400  # 24 heures
       WATCHTOWER_INCLUDE_STOPPED: "true"
     networks:
-      - invexapps_net
+      - invexqr_net
     profiles:
       - monitoring
 
 networks:
-  invexapps_net:
+  invexqr_net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 10.100.2.0/16
 
 volumes:
   postgres_data:
