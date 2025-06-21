@@ -32,7 +32,7 @@ export function useAuth() {
     if (isAuthenticated && user && !hasShownWelcome.current) {
       hasShownWelcome.current = true;
       
-      const firstName = user.firstName || user.email?.split('@')[0] || 'Utilisateur';
+      const firstName = (user as any).firstName || (user as any).email?.split('@')[0] || 'Utilisateur';
       
       toast({
         title: "Bienvenue sur InvexQR !",

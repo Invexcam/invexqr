@@ -307,6 +307,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             city: location.city,
             deviceType,
           });
+          
+          // Send email notification for QR code scan
+          try {
+            const user = await storage.getUser(qrCode.userId);
+            if (user && user.email) {
+              const userName = user.firstName || user.email.split('@')[0];
+              const scanLocation = `${location.city}, ${location.country}`;
+              await emailService.sendQRCodeScannedEmail(
+                user.email,
+                userName,
+                qrCode.name,
+                scanLocation
+              );
+            }
+          } catch (emailError) {
+            console.error("Failed to send scan notification email:", emailError);
+          }
         } catch (scanError) {
           // Don't fail redirect if scan recording fails
           console.error("Error recording scan:", scanError);
