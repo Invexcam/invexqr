@@ -74,7 +74,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-white shadow-sm border-b relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -117,8 +117,8 @@ export default function Landing() {
         
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white border-b shadow-lg z-50">
-            <div className="px-4 py-6 space-y-4">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b shadow-lg z-50">
+            <div className="px-4 py-4 space-y-2">
               <a href="#features" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
                 Features
               </a>
@@ -128,11 +128,11 @@ export default function Landing() {
               <a href="/contact" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
                 Contact
               </a>
-              <div className="pt-4 border-t space-y-3">
-                <Button variant="ghost" onClick={handleLogin} className="w-full justify-start text-primary hover:text-primary/90">
+              <div className="pt-2 border-t space-y-2">
+                <Button variant="ghost" onClick={handleLogin} className="w-full justify-start text-primary hover:text-primary/90 h-10">
                   Login
                 </Button>
-                <Button onClick={handleLogin} className="w-full bg-primary hover:bg-primary/90">
+                <Button onClick={handleLogin} className="w-full bg-primary hover:bg-primary/90 h-10">
                   Get Started
                 </Button>
               </div>
