@@ -87,7 +87,7 @@ export default function Landing() {
               <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">
                 Features
               </a>
-              <a href="#pricing" className="text-muted-foreground hover:text-primary transition-colors">
+              <a href="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
                 Pricing
               </a>
               <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
@@ -122,7 +122,7 @@ export default function Landing() {
               <a href="#features" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
                 Features
               </a>
-              <a href="#pricing" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
+              <a href="/pricing" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
                 Pricing
               </a>
               <a href="/contact" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">

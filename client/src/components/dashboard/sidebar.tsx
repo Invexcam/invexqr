@@ -79,7 +79,7 @@ export default function Sidebar({ currentView }: SidebarProps) {
               size="sm" 
               className="w-full bg-white text-primary hover:bg-gray-100"
             >
-              29,99€/mois
+              5$/mois
             </Button>
           </div>
         </Link>

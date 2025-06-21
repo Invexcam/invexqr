@@ -127,10 +127,10 @@ export default function PayPalSubscription({ onSubscriptionSuccess }: PayPalSubs
 
         {/* Pricing */}
         <div className="text-center py-4 border-t border-b">
-          <div className="text-3xl font-bold">29,99€</div>
+          <div className="text-3xl font-bold">5$</div>
           <div className="text-sm text-muted-foreground">par mois</div>
           <Badge variant="secondary" className="mt-2">
-            Annulable à tout moment
+            Offre CEO Exclusive
           </Badge>
         </div>
 
