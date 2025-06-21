@@ -126,11 +126,13 @@ export default function Pricing() {
 
             <CardContent className="px-8 pb-8">
               <Button 
-                onClick={handleGetStarted} 
-                className="w-full bg-primary hover:bg-primary/90 text-lg py-6 mb-6"
+                onClick={() => window.open('https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-4F775898EU1340713NBLITJI', '_blank')}
+                className="w-full bg-[#0070ba] hover:bg-[#003087] text-white text-lg py-6 mb-6"
               >
-                <Zap className="w-5 h-5 mr-2" />
-                Activer maintenant
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.232c-.547-.168-1.193-.232-1.907-.232h-2.592c-.524 0-.968.381-1.05.9L14.45 9.56c-.065.417.24.777.667.777h1.357c2.422 0 4.75-1.584 5.15-5.42z"/>
+                </svg>
+                S'abonner via PayPal
               </Button>
 
               <div className="space-y-3">
@@ -260,12 +262,14 @@ export default function Pricing() {
             Rejoignez les entreprises qui font confiance à InvexQR
           </p>
           <Button 
-            onClick={handleGetStarted}
+            onClick={() => window.open('https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-4F775898EU1340713NBLITJI', '_blank')}
             size="lg" 
-            className="bg-primary hover:bg-primary/90 text-lg px-12 py-6"
+            className="bg-[#0070ba] hover:bg-[#003087] text-white text-lg px-12 py-6"
           >
-            <Crown className="w-5 h-5 mr-2" />
-            Commencer pour 5$/mois
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.232c-.547-.168-1.193-.232-1.907-.232h-2.592c-.524 0-.968.381-1.05.9L14.45 9.56c-.065.417.24.777.667.777h1.357c2.422 0 4.75-1.584 5.15-5.42z"/>
+            </svg>
+            S'abonner via PayPal - 5$/mois
           </Button>
           <p className="text-sm text-gray-500 mt-4">
             Activation immédiate • Paiement sécurisé par PayPal

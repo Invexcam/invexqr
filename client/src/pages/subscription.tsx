@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth';
-import SimplePayPalButton from '@/components/SimplePayPalButton';
+import PayPalButton from '@/components/PayPalButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowLeft } from 'lucide-react';
@@ -131,7 +131,7 @@ export default function Subscription() {
             </CardHeader>
 
             <CardContent className="px-8 pb-8">
-              <SimplePayPalButton onSubscriptionSuccess={handleSubscriptionSuccess} />
+              <PayPalButton onSubscriptionSuccess={handleSubscriptionSuccess} />
             </CardContent>
           </Card>
         </div>
