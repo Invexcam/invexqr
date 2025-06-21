@@ -253,7 +253,7 @@ export default function Landing() {
                         <div>
                           <div className="text-xs text-muted-foreground">Scans Today</div>
                           <div className="text-lg font-bold text-foreground">
-                            {isLoading ? "..." : (stats?.scansToday?.toLocaleString() || "0")}
+                            {isLoading ? "..." : ((stats as any)?.scansToday?.toLocaleString() || "0")}
                           </div>
                         </div>
                       </div>
