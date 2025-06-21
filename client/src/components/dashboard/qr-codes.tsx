@@ -245,10 +245,15 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
             <Card key={qr.id} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-16 h-16 bg-white border-2 border-border rounded-lg p-2">
+                  <div 
+                    className="w-16 h-16 bg-white border-2 border-border rounded-lg p-2 cursor-pointer hover:shadow-lg hover:scale-105 transition-all duration-200"
+                    onClick={() => window.open(getQRCodeUrl(qr.shortCode), '_blank')}
+                    title="Cliquer pour ouvrir le QR code"
+                  >
                     <QRCodeDisplay 
                       value={getQRCodeUrl(qr.shortCode)}
                       size={48}
+                      style={qr.style}
                     />
                   </div>
                   <div className="flex space-x-2">
@@ -258,6 +263,7 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
                         size="icon" 
                         className="text-muted-foreground hover:text-primary"
                         onClick={() => setEditingQR(qr)}
+                        title="Modifier le QR code"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -269,6 +275,7 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
                       className="text-muted-foreground hover:text-destructive"
                       onClick={() => deleteMutation.mutate(qr.id)}
                       disabled={deleteMutation.isPending}
+                      title="Supprimer le QR code"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -277,41 +284,51 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
                 <h3 className="font-semibold text-foreground mb-2 truncate" title={qr.name}>
                   {qr.name}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4 truncate" title={qr.originalUrl}>
-                  {qr.originalUrl}
-                </p>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Scans</span>
-                  <span className="font-medium text-foreground">
-                    {qr.scanCount?.toLocaleString() || 0}
-                  </span>
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground truncate" title={qr.originalUrl}>
+                    <span className="font-medium">URL:</span> {qr.originalUrl}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1" title={getQRCodeUrl(qr.shortCode)}>
+                    <span className="font-medium">Tracking:</span> {getQRCodeUrl(qr.shortCode)}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Created</span>
-                  <span className="text-muted-foreground">
-                    {formatTimeAgo(qr.createdAt)}
-                  </span>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <div className="text-lg font-semibold text-foreground">
+                      {qr.scanCount?.toLocaleString() || 0}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Scans</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <div className="text-sm font-medium text-foreground">
+                      {formatTimeAgo(qr.createdAt)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Créé</div>
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                
+                <div className="flex items-center justify-between">
                   <Badge 
                     variant={qr.isActive ? "default" : "secondary"}
-                    className={`cursor-pointer ${
+                    className={`cursor-pointer transition-colors ${
                       qr.isActive 
-                        ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" 
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        ? "bg-green-100 text-green-800 hover:bg-green-200" 
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                     onClick={() => toggleStatusMutation.mutate({ 
                       id: qr.id, 
                       isActive: !qr.isActive 
                     })}
+                    title="Cliquer pour changer le statut"
                   >
-                    {qr.isActive ? "Active" : "Paused"}
+                    {qr.isActive ? "Actif" : "Pausé"}
                   </Badge>
                   <Badge 
                     variant="outline"
-                    className="bg-primary/10 text-primary border-primary/20"
+                    className="bg-blue-50 text-blue-700 border-blue-200"
                   >
-                    {qr.type === "dynamic" ? "Dynamic" : "Static"}
+                    {qr.type === "dynamic" ? "Dynamique" : "Statique"}
                   </Badge>
                 </div>
               </CardContent>

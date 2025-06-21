@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QrCode, MousePointer, Calendar, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { QrCode, MousePointer, Calendar, TrendingUp, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import QRCodeDisplay from "@/components/ui/qr-code-display";
 
 interface OverviewProps {
   onCreateClick: () => void;
@@ -38,6 +40,15 @@ export default function Overview({ onCreateClick }: OverviewProps) {
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
     return `${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  const getQRCodeUrl = (shortCode: string) => {
+    return `${window.location.origin}/r/${shortCode}`;
+  };
+
+  const handleQRCodeClick = (qrCode: any) => {
+    const url = getQRCodeUrl(qrCode.shortCode);
+    window.open(url, '_blank');
   };
 
   if (analyticsLoading) {
@@ -185,15 +196,43 @@ export default function Overview({ onCreateClick }: OverviewProps) {
                     </div>
                   ))
                 ) : recentQRCodes?.slice(0, 3).map((qr: any) => (
-                  <div key={qr.id} className="flex items-center justify-between p-4 bg-muted rounded-xl">
+                  <div 
+                    key={qr.id} 
+                    className="flex items-center justify-between p-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors cursor-pointer group"
+                    onClick={() => handleQRCodeClick(qr)}
+                  >
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-white border-2 border-border rounded-lg flex items-center justify-center">
-                        <QrCode className="w-6 h-6 text-muted-foreground" />
+                      <div className="relative">
+                        <QRCodeDisplay 
+                          value={getQRCodeUrl(qr.shortCode)}
+                          size={48}
+                          className="border-2 border-border rounded-lg"
+                          style={qr.style}
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center">
+                          <ExternalLink className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
                       </div>
                       <div>
-                        <div className="font-medium text-foreground">{qr.name}</div>
+                        <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                          {qr.name}
+                        </div>
                         <div className="text-sm text-muted-foreground truncate max-w-64">
                           {qr.originalUrl}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge 
+                            variant={qr.isActive ? "default" : "secondary"}
+                            className="text-xs"
+                          >
+                            {qr.isActive ? "Actif" : "Pausé"}
+                          </Badge>
+                          <Badge 
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {qr.type === "dynamic" ? "Dynamique" : "Statique"}
+                          </Badge>
                         </div>
                       </div>
                     </div>
