@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Contact from "@/pages/contact";
+import Subscription from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard/:view?" component={Dashboard} />
           <Route path="/contact" component={Contact} />
+          <Route path="/subscription" component={Subscription} />
         </>
       )}
       <Route component={NotFound} />

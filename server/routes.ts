@@ -62,6 +62,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           firstName: null,
           lastName: null,
           profileImageUrl: null,
+          subscriptionId: null,
+          subscriptionStatus: "FREE",
+          subscriptionPlanId: null,
         });
       }
       
@@ -69,6 +72,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Subscription management
+  app.post('/api/subscription', authenticateUser as any, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { subscriptionId, planId, status } = req.body;
+
+      // Update user subscription
+      const updatedUser = await storage.updateUserSubscription(userId, {
+        subscriptionId,
+        subscriptionStatus: status,
+        subscriptionPlanId: planId,
+      });
+
+      if (updatedUser) {
+        // Send subscription activation email
+        try {
+          if (updatedUser.email) {
+            const userName = updatedUser.firstName || updatedUser.email.split('@')[0];
+            await emailService.sendActionNotificationEmail(
+              updatedUser.email,
+              userName,
+              "Abonnement Premium Activé",
+              `Votre abonnement Premium InvexQR est maintenant actif. ID: ${subscriptionId}`
+            );
+          }
+        } catch (emailError) {
+          console.error("Failed to send subscription email:", emailError);
+        }
+
+        res.json({ success: true, user: updatedUser });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+      res.status(500).json({ message: "Failed to update subscription" });
+    }
+  });
+
+  app.get('/api/subscription/status', authenticateUser as any, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (user) {
+        res.json({
+          hasActiveSubscription: user.subscriptionStatus === 'ACTIVE',
+          subscriptionId: user.subscriptionId,
+          planId: user.subscriptionPlanId,
+          status: user.subscriptionStatus
+        });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error fetching subscription status:", error);
+      res.status(500).json({ message: "Failed to fetch subscription status" });
     }
   });
 

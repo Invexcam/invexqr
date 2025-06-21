@@ -18,6 +18,11 @@ export interface IStorage {
   // (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserSubscription(userId: string, subscription: {
+    subscriptionId: string;
+    subscriptionStatus: string;
+    subscriptionPlanId: string;
+  }): Promise<User | undefined>;
   
   // QR Code operations
   getUserQRCodes(userId: string): Promise<QRCode[]>;

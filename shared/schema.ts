@@ -33,6 +33,9 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  subscriptionId: varchar("subscription_id"),
+  subscriptionStatus: varchar("subscription_status").default("FREE"),
+  subscriptionPlanId: varchar("subscription_plan_id"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
