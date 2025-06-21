@@ -206,43 +206,94 @@ export default function Analytics() {
       </div>
 
       {/* Location Analytics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Locations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {locationLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="text-center p-4 bg-muted rounded-xl">
-                  <Skeleton className="h-8 w-16 mx-auto mb-2" />
-                  <Skeleton className="h-4 w-20 mx-auto" />
-                </div>
-              ))}
-            </div>
-          ) : locationBreakdown && locationBreakdown.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {locationBreakdown.slice(0, 8).map((location: any, index: number) => (
-                <div key={location.country} className="text-center p-4 bg-muted rounded-xl">
-                  <div className="text-2xl font-bold text-foreground">
-                    {location.count.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {location.country}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl">🌍</span>
+      <div className="grid lg:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Scans par Pays</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {locationLoading ? (
+              <Skeleton className="w-full h-64" />
+            ) : locationBreakdown && locationBreakdown.length > 0 ? (
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={locationBreakdown.slice(0, 10)} layout="horizontal">
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} />
+                    <YAxis 
+                      type="category" 
+                      dataKey="country" 
+                      tick={{ fontSize: 12 }}
+                      width={80}
+                    />
+                    <Tooltip 
+                      formatter={(value) => [value, 'Scans']}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      fill="hsl(var(--primary))"
+                      radius={[0, 4, 4, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-              <p className="text-muted-foreground">No location data available yet</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">🌍</span>
+                </div>
+                <p className="text-muted-foreground">Aucune donnée de localisation disponible</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Locations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {locationLoading ? (
+              <div className="space-y-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-xl">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                ))}
+              </div>
+            ) : locationBreakdown && locationBreakdown.length > 0 ? (
+              <div className="space-y-3">
+                {locationBreakdown.slice(0, 8).map((location: any, index: number) => (
+                  <div key={location.country} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 rounded-full bg-primary"></div>
+                      <span className="text-sm font-medium text-foreground">
+                        {location.country}
+                      </span>
+                    </div>
+                    <div className="text-sm font-bold text-foreground">
+                      {location.count.toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">🌍</span>
+                </div>
+                <p className="text-muted-foreground">Aucune donnée de localisation disponible</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Scan Activity Timeline */}
       <Card>

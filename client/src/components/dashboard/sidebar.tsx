@@ -51,8 +51,8 @@ export default function Sidebar({ currentView }: SidebarProps) {
       <nav className="p-6 space-y-2">
         {navigation.map((item) => (
           <Link key={item.name} href={item.href}>
-            <a
-              className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+            <div
+              className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors cursor-pointer ${
                 item.current
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-primary hover:bg-primary/5"
@@ -60,7 +60,7 @@ export default function Sidebar({ currentView }: SidebarProps) {
             >
               <item.icon className="w-5 h-5" />
               <span>{item.name}</span>
-            </a>
+            </div>
           </Link>
         ))}
       </nav>
