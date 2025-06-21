@@ -179,16 +179,6 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">QR Codes</h2>
-          <p className="text-muted-foreground">Manage all your QR codes in one place</p>
-        </div>
-        <Button onClick={onCreateClick} className="bg-primary hover:bg-primary/90">
-          <Plus className="w-4 h-4 mr-2" />
-          Create New QR Code
-        </Button>
-      </div>
 
       {/* Filters */}
       <Card>
