@@ -96,20 +96,20 @@ export default function Dashboard() {
   };
 
   const getUserInitials = () => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    if ((user as any).firstName && (user as any).lastName) {
+      return `${(user as any).firstName[0]}${(user as any).lastName[0]}`.toUpperCase();
     }
-    if (user.email) {
-      return user.email.substring(0, 2).toUpperCase();
+    if ((user as any).email) {
+      return (user as any).email.substring(0, 2).toUpperCase();
     }
     return "U";
   };
 
   const getUserDisplayName = () => {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    if ((user as any).firstName && (user as any).lastName) {
+      return `${(user as any).firstName} ${(user as any).lastName}`;
     }
-    return user.email || "User";
+    return (user as any).email || "User";
   };
 
   return (
@@ -126,13 +126,23 @@ export default function Dashboard() {
               <p className="text-muted-foreground">{subtitle}</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => setShowCreateModal(true)}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create QR Code
-              </Button>
+              {hasActiveSubscription ? (
+                <Button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create QR Code
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => window.location.href = '/subscription'}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade to Create
+                </Button>
+              )}
               <div className="relative">
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="w-5 h-5" />
@@ -141,7 +151,7 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center space-x-3">
                 <Avatar>
-                  <AvatarImage src={user.profileImageUrl || undefined} />
+                  <AvatarImage src={(user as any).profileImageUrl || undefined} />
                   <AvatarFallback className="bg-primary text-white">
                     {getUserInitials()}
                   </AvatarFallback>
@@ -151,7 +161,7 @@ export default function Dashboard() {
                     {getUserDisplayName()}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {user.email}
+                    {(user as any).email}
                   </div>
                 </div>
               </div>
