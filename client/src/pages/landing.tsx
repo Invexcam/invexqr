@@ -70,19 +70,19 @@ export default function Landing() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">
-                Features
+                Fonctionnalités
               </a>
               <a href="#pricing" className="text-muted-foreground hover:text-primary transition-colors">
-                Pricing
+                Tarifs
               </a>
-              <a href="#analytics" className="text-muted-foreground hover:text-primary transition-colors">
-                Analytics
+              <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                Contact
               </a>
               <Button variant="ghost" onClick={handleLogin} className="text-primary hover:text-primary/90">
-                Sign In
+                Connexion
               </Button>
               <Button onClick={handleLogin} className="bg-primary hover:bg-primary/90">
-                Get Started
+                Commencer
               </Button>
             </div>
             <Button variant="ghost" size="icon" className="md:hidden">
@@ -101,21 +101,21 @@ export default function Landing() {
             <div className="space-y-8 animate-slide-up">
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
-                  Generate & Track
-                  <span className="text-primary"> QR Codes</span>
-                  Like a Pro
+                  Générateur QR Code
+                  <span className="text-primary"> Professionnel</span>
+                  pour le Cameroun
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Create dynamic QR codes, manage redirections, and track real-time analytics with our powerful SaaS platform. Perfect for businesses of all sizes.
+                  Créez des QR codes dynamiques avec analytics en temps réel. Solution professionnelle pour entreprises au Cameroun, en Afrique et dans le monde entier.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={handleLogin} size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8 py-4">
-                  Start Free Trial
+                  Essai Gratuit 14 Jours
                 </Button>
                 <Button onClick={handleCreateQR} variant="outline" size="lg" className="text-lg px-8 py-4">
                   <QrCode className="w-5 h-5 mr-2" />
-                  Create QR Code
+                  Générer QR Code Gratuit
                 </Button>
               </div>
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
@@ -123,13 +123,13 @@ export default function Landing() {
                   <svg className="w-4 h-4 text-secondary mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  Free 14-day trial
+                  Essai gratuit 14 jours
                 </div>
                 <div className="flex items-center">
                   <svg className="w-4 h-4 text-secondary mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  No credit card required
+                  Aucune carte de crédit requise
                 </div>
               </div>
             </div>
