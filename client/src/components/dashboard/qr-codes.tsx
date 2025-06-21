@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import QRCodeDisplay from "@/components/ui/qr-code";
+import QRDownloadButton from "@/components/qr-download-button";
+import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
 
 interface QRCodesProps {
   onCreateClick: () => void;
@@ -20,6 +22,7 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [editingQR, setEditingQR] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -259,9 +262,17 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
                     />
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                      <Edit className="w-4 h-4" />
-                    </Button>
+                    {qr.type === 'dynamic' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-muted-foreground hover:text-primary"
+                        onClick={() => setEditingQR(qr)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <QRDownloadButton qrCode={qr} />
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -317,6 +328,16 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Edit Modal for Dynamic QR Codes */}
+      {editingQR && (
+        <EnhancedCreateQRModal
+          open={!!editingQR}
+          onOpenChange={(open) => !open && setEditingQR(null)}
+          editMode={true}
+          initialData={editingQR}
+        />
       )}
     </div>
   );

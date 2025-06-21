@@ -80,9 +80,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id;
       
       // Enhanced QR code data with new fields
+      const generateOriginalUrl = (contentType: string, content: any) => {
+        if (contentType === 'url' && content.url) {
+          return content.url;
+        }
+        // For non-URL types, create a redirect URL
+        return `${req.protocol}://${req.get('host')}/qr/${Date.now()}`;
+      };
+
       const qrData = {
         name: req.body.name,
-        originalUrl: req.body.originalUrl,
+        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content),
         type: req.body.type || 'dynamic',
         contentType: req.body.contentType || 'url',
         content: req.body.content || {},
