@@ -92,8 +92,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createQRCode(userId: string, qrCodeData: InsertQRCode): Promise<QRCode> {
-    // Generate a unique short code
-    const shortCode = this.generateShortCode();
+    // Use provided shortCode or generate a unique one
+    const shortCode = qrCodeData.shortCode || this.generateShortCode();
     
     const [qrCode] = await db
       .insert(qrCodes)

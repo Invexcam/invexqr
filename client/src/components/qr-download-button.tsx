@@ -15,6 +15,7 @@ interface QRDownloadButtonProps {
     id: number;
     name: string;
     originalUrl: string;
+    shortCode: string;
     contentType: string;
     content: any;
     style: any;
@@ -26,36 +27,8 @@ export default function QRDownloadButton({ qrCode }: QRDownloadButtonProps) {
   const { toast } = useToast();
 
   const generateQRContent = () => {
-    if (qrCode.contentType === 'url' && qrCode.content?.url) {
-      return qrCode.content.url;
-    }
-    if (qrCode.contentType === 'text' && qrCode.content?.text) {
-      return qrCode.content.text;
-    }
-    if (qrCode.contentType === 'vcard' && qrCode.content) {
-      const vcard = qrCode.content;
-      return `BEGIN:VCARD
-VERSION:3.0
-FN:${vcard.name || ''}
-ORG:${vcard.organization || ''}
-TEL:${vcard.phone || ''}
-EMAIL:${vcard.email || ''}
-URL:${vcard.website || ''}
-NOTE:${vcard.note || ''}
-END:VCARD`;
-    }
-    if (qrCode.contentType === 'phone' && qrCode.content?.number) {
-      return `tel:${qrCode.content.number}`;
-    }
-    if (qrCode.contentType === 'sms' && qrCode.content?.number) {
-      return `sms:${qrCode.content.number}${qrCode.content.message ? `?body=${encodeURIComponent(qrCode.content.message)}` : ''}`;
-    }
-    if (qrCode.contentType === 'email' && qrCode.content?.address) {
-      const email = qrCode.content;
-      return `mailto:${email.address}${email.subject ? `?subject=${encodeURIComponent(email.subject)}` : ''}${email.body ? `&body=${encodeURIComponent(email.body)}` : ''}`;
-    }
-    
-    return qrCode.originalUrl;
+    // Always use tracking redirect URL for all QR codes
+    return `${window.location.origin}/r/${qrCode.shortCode}`;
   };
 
   const handleDownload = async (format: 'png' | 'svg') => {
