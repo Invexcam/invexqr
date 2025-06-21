@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { authenticateUser, type AuthenticatedRequest } from "./authMiddleware";
 import { insertQRCodeSchema, insertQRScanSchema } from "@shared/schema";
 import { z } from "zod";
+import axios from "axios";
 
 function getDeviceType(userAgent: string): string {
   const ua = userAgent.toLowerCase();
@@ -17,13 +18,29 @@ function getDeviceType(userAgent: string): string {
   }
 }
 
-function getLocationFromIP(ip: string): { country: string; city: string } {
-  // In a real implementation, you would use a service like MaxMind GeoIP2 or IP-API
-  // For now, we'll return placeholder values
-  return {
-    country: 'Unknown',
-    city: 'Unknown'
-  };
+async function getLocationFromIP(ip: string): Promise<{ country: string; city: string }> {
+  try {
+    // Skip geolocation for localhost/development IPs
+    if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.") || ip.startsWith("10.0.")) {
+      return { country: "Local", city: "Development" };
+    }
+
+    // Use ipapi.co for geolocation (free tier: 1000 requests/day)
+    const response = await axios.get(`https://ipapi.co/${ip}/json/`, {
+      timeout: 3000,
+      headers: {
+        'User-Agent': 'InvexQR/1.0'
+      }
+    });
+
+    return {
+      country: response.data.country_name || "Unknown",
+      city: response.data.city || "Unknown"
+    };
+  } catch (error) {
+    console.error("Geolocation error:", error);
+    return { country: "Unknown", city: "Unknown" };
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -198,7 +215,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userAgent = req.headers['user-agent'] || '';
       const ip = req.ip || req.connection.remoteAddress || '';
       const deviceType = getDeviceType(userAgent);
-      const location = getLocationFromIP(ip);
+      
+      // Get geolocation data asynchronously
+      const location = await getLocationFromIP(ip);
       
       await storage.recordScan({
         qrCodeId: qrCode.id,

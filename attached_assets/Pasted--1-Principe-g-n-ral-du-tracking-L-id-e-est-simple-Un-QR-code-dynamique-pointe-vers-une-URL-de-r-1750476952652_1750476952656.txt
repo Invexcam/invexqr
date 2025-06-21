@@ -1,0 +1,111 @@
+✅ 1. Principe général du tracking
+L’idée est simple :
+
+Un QR code dynamique pointe vers une URL de redirection (de ton domaine).
+
+Quand quelqu’un le scanne, il est d’abord redirigé vers ton serveur, où tu enregistres les infos du scan, puis tu le rediriges vers l’URL cible configurée.
+
+🧱 2. Architecture technique
+🔗 Exemple de structure d’URL du QR code dynamique :
+arduino
+Copier
+Modifier
+https://invexqr.com/r/abc123
+abc123 est un identifiant unique du QR code stocké dans ta base de données.
+
+Il est lié à une URL cible configurée par l’utilisateur.
+
+⚙️ 3. Fonctionnement du endpoint /r/:code
+a. Le serveur reçoit la requête :
+http
+Copier
+Modifier
+GET /r/abc123
+b. Le serveur :
+Cherche le QR code abc123 dans la base.
+
+Enregistre un nouveau scan :
+
+IP (géolocalisation via un service comme ipapi.co ou MaxMind)
+
+User-Agent (navigateur, OS, mobile/desktop)
+
+Date/heure
+
+Code QR concerné
+
+Redirige l’utilisateur vers l’URL cible :
+
+http
+Copier
+Modifier
+HTTP 302 Location: https://exemple.com/page-offre
+📦 4. Structure de la base de données (simplifiée)
+qr_codes
+id	user_id	code	target_url	type	created_at
+
+qr_scans
+| id | qr_code_id | scanned_at | ip_address | user_agent | country | city |
+
+🧰 5. Technos et outils recommandés
+Backend : Node.js (Express) ou Django / Flask
+
+Base de données : PostgreSQL ou MongoDB
+
+Tracking IP : API gratuite (ipapi.co, ipinfo.io) ou MaxMind GeoLite2
+
+Redirection : HTTP 302
+
+Sécurité :
+
+Limiter les scans suspects (bot)
+
+Nettoyer les IP anonymisées si RGPD/CCPA
+
+Dashboard client : graphique du nombre de scans, localisation, date
+
+🔁 6. Exemple de code en Node.js (Express)
+javascript
+Copier
+Modifier
+app.get('/r/:code', async (req, res) => {
+  const code = req.params.code;
+  const qr = await QRCode.findOne({ code });
+  if (!qr) return res.status(404).send('QR code not found');
+
+  const userAgent = req.get('User-Agent');
+  const ip = req.ip;
+
+  // Géolocalisation (via ipapi)
+  const geo = await axios.get(`https://ipapi.co/${ip}/json/`);
+
+  await QRScan.create({
+    qr_code_id: qr.id,
+    scanned_at: new Date(),
+    ip_address: ip,
+    user_agent: userAgent,
+    country: geo.data.country_name,
+    city: geo.data.city
+  });
+
+  res.redirect(qr.target_url);
+});
+📊 7. Interface de visualisation
+Dans le dashboard client :
+
+Total de scans
+
+Scans par jour/semaine/mois
+
+Carte du monde (📍) des lieux de scan
+
+Types d’appareils (mobile, desktop)
+
+Heure de pointe
+
+⚠️ 8. À ne pas oublier
+Élément	Détail
+✅ Caching	Cache IP/localisation pour éviter surcharge API
+✅ RGPD	Anonymiser IP ou demander consentement si Europe
+✅ Protection	Bloquer bots ou abus (ex : scan répétés d’une même IP)
+✅ Évolutivité	Architecture orientée événements pour gérer forte charge
