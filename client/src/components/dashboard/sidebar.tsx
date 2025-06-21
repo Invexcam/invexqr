@@ -4,6 +4,7 @@ import { QrCode, BarChart3, Settings, Home, LogOut, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { logOut } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import Logo from "@/components/ui/logo";
 
 interface SidebarProps {
   currentView: string;
@@ -40,12 +41,7 @@ export default function Sidebar({ currentView }: SidebarProps) {
   return (
     <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-40">
       <div className="p-6 border-b">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <QrCode className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-xl font-bold text-foreground">InvexQR</span>
-        </div>
+        <Logo size="md" />
       </div>
       
       <nav className="p-6 space-y-2">

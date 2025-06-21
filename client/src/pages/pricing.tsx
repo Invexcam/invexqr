@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Star, Zap, Shield, BarChart3, QrCode, Users, Globe } from "lucide-react";
 import AuthModal from "@/components/auth/auth-modal";
+import Logo from "@/components/ui/logo";
 import { Link } from "wouter";
 
 export default function Pricing() {
@@ -58,12 +59,7 @@ export default function Pricing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/">
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <QrCode className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-xl font-bold text-foreground">InvexQR</span>
-              </div>
+              <Logo size="md" className="cursor-pointer" />
             </Link>
             <Button onClick={handleGetStarted} className="bg-primary hover:bg-primary/90">
               Commencer maintenant
