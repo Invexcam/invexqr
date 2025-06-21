@@ -1,14 +1,33 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { QrCode, BarChart3, Settings, Home, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { logOut } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps {
   currentView: string;
 }
 
 export default function Sidebar({ currentView }: SidebarProps) {
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const { authProvider } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    if (authProvider === 'firebase') {
+      const { error } = await logOut();
+      if (error) {
+        toast({
+          title: "Logout Failed",
+          description: error,
+          variant: "destructive",
+        });
+      } else {
+        window.location.reload();
+      }
+    } else {
+      window.location.href = "/api/logout";
+    }
   };
 
   const navigation = [

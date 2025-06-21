@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { authenticateUser, type AuthenticatedRequest } from "./authMiddleware";
 import { insertQRCodeSchema, insertQRScanSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -30,10 +31,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', authenticateUser, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const userId = req.user!.id;
+      let user = await storage.getUser(userId);
+      
+      // If Firebase user doesn't exist in database, create them
+      if (!user && req.user!.authProvider === 'firebase') {
+        user = await storage.upsertUser({
+          id: userId,
+          email: req.user!.email || null,
+          firstName: null,
+          lastName: null,
+          profileImageUrl: null,
+        });
+      }
+      
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -42,9 +55,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // QR Code routes
-  app.get('/api/qr-codes', isAuthenticated, async (req: any, res) => {
+  app.get('/api/qr-codes', authenticateUser, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.id;
       const qrCodes = await storage.getUserQRCodes(userId);
       
       // Add scan counts to each QR code
