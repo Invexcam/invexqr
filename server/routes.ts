@@ -45,6 +45,15 @@ async function getLocationFromIP(ip: string): Promise<{ country: string; city: s
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check route for Docker
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      service: 'InvexQR API'
+    });
+  });
+
   // Auth middleware
   await setupAuth(app);
 

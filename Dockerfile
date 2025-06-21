@@ -10,30 +10,26 @@ RUN apk add --no-cache \
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de configuration
+# Copier les fichiers de configuration pour les dépendances
 COPY package*.json ./
-COPY tsconfig.json ./
-COPY vite.config.ts ./
-COPY tailwind.config.ts ./
-COPY postcss.config.js ./
-COPY components.json ./
-COPY drizzle.config.ts ./
-
-# Installer les dépendances
-RUN npm ci --only=production && npm cache clean --force
 
 # Stage de développement
 FROM base AS development
 RUN npm ci
 COPY . .
+EXPOSE 5000
 CMD ["npm", "run", "dev"]
 
 # Stage de build
-FROM base AS build
+FROM base AS builder
+
+# Installer toutes les dépendances (dev + prod)
 RUN npm ci
+
+# Copier tout le code source
 COPY . .
 
-# Build de l'application
+# Compiler TypeScript et construire l'application
 RUN npm run build
 
 # Stage de production
@@ -48,24 +44,26 @@ RUN apk add --no-cache \
 
 # Créer un utilisateur non-root
 RUN addgroup -g 1001 -S nodejs \
-    && adduser -S nextjs -u 1001
+    && adduser -S invexqr -u 1001
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de production depuis le stage build
-COPY --from=build --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=build --chown=nextjs:nodejs /app/dist ./dist
-COPY --from=build --chown=nextjs:nodejs /app/server ./server
-COPY --from=build --chown=nextjs:nodejs /app/shared ./shared
-COPY --from=build --chown=nextjs:nodejs /app/drizzle.config.ts ./
+# Copier package.json et installer uniquement les dépendances de production
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copier les fichiers compilés depuis le stage builder
+COPY --from=builder --chown=invexqr:nodejs /app/dist ./dist
+COPY --from=builder --chown=invexqr:nodejs /app/server ./server
+COPY --from=builder --chown=invexqr:nodejs /app/shared ./shared
+COPY --from=builder --chown=invexqr:nodejs /app/drizzle.config.ts ./
 
 # Créer le répertoire des logs
-RUN mkdir -p /app/logs && chown nextjs:nodejs /app/logs
+RUN mkdir -p /app/logs && chown invexqr:nodejs /app/logs
 
 # Changer vers l'utilisateur non-root
-USER nextjs
+USER invexqr
 
 # Exposer le port
 EXPOSE 5000
@@ -73,6 +71,7 @@ EXPOSE 5000
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
 ENV PORT=5000
+ENV HOST=0.0.0.0
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
@@ -81,5 +80,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # Utiliser dumb-init comme PID 1
 ENTRYPOINT ["dumb-init", "--"]
 
-# Commande de démarrage
-CMD ["node", "server/index.js"]
+# Commande de démarrage (utiliser tsx pour exécuter TypeScript directement)
+CMD ["npx", "tsx", "server/index.ts"]
