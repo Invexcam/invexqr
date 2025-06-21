@@ -5,12 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { QrCode, MousePointer, Calendar, TrendingUp, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import QRCodeDisplay from "@/components/ui/qr-code-display";
+import { useLocation } from "wouter";
 
 interface OverviewProps {
   onCreateClick: () => void;
 }
 
 export default function Overview({ onCreateClick }: OverviewProps) {
+  const [, setLocation] = useLocation();
+  
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ["/api/analytics/overview"],
   });
@@ -172,7 +175,12 @@ export default function Overview({ onCreateClick }: OverviewProps) {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Recent QR Codes</CardTitle>
-                <Button variant="ghost" size="sm" className="text-primary hover:text-primary/90">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-primary hover:text-primary/90"
+                  onClick={() => setLocation("/dashboard/qr-codes")}
+                >
                   View All
                 </Button>
               </div>
