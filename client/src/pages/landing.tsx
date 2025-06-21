@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { QrCode, BarChart3, Link, Palette, Shield, Code } from "lucide-react";
+import { QrCode, BarChart3, Link, Palette, Shield, Code, Users, TrendingUp } from "lucide-react";
 import AuthModal from "@/components/auth/auth-modal";
 import PublicQRGenerator from "@/components/public-qr-generator";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Landing() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateQR, setShowCreateQR] = useState(false);
+
+  // Fetch public statistics with auto-refresh every 30 seconds
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['/api/public/stats'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 25000,
+  });
 
   const handleLogin = () => {
     setShowAuthModal(true);
@@ -140,19 +148,79 @@ export default function Landing() {
                   alt="Modern office workspace" 
                   className="rounded-2xl shadow-2xl w-full" 
                 />
-                <Card className="absolute -bottom-6 -left-6 shadow-lg border">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                        <BarChart3 className="w-6 h-6 text-secondary" />
+                {/* Real-time Statistics Cards */}
+                <div className="absolute -bottom-8 -left-8 space-y-4">
+                  {/* Total Scans Card */}
+                  <Card className="shadow-lg border bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <BarChart3 className="w-5 h-5 text-secondary" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Total Scans</div>
+                          <div className="text-lg font-bold text-foreground">
+                            {isLoading ? "..." : (stats?.totalScans?.toLocaleString() || "0")}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Total Scans Today</div>
-                        <div className="text-2xl font-bold text-foreground">12,847</div>
+                    </CardContent>
+                  </Card>
+
+                  {/* QR Codes Generated Card */}
+                  <Card className="shadow-lg border bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <QrCode className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">QR Codes Generated</div>
+                          <div className="text-lg font-bold text-foreground">
+                            {isLoading ? "..." : (stats?.totalQRCodes?.toLocaleString() || "0")}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Additional Stats on the Right */}
+                <div className="absolute -bottom-8 -right-8 space-y-4">
+                  {/* Users Card */}
+                  <Card className="shadow-lg border bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <Users className="w-5 h-5 text-accent" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Active Users</div>
+                          <div className="text-lg font-bold text-foreground">
+                            {isLoading ? "..." : (stats?.totalUsers?.toLocaleString() || "0")}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Today's Scans Card */}
+                  <Card className="shadow-lg border bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Scans Today</div>
+                          <div className="text-lg font-bold text-foreground">
+                            {isLoading ? "..." : (stats?.scansToday?.toLocaleString() || "0")}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           </div>

@@ -42,6 +42,12 @@ export interface IStorage {
   getLocationBreakdown(userId: string): Promise<{ country: string; count: number }[]>;
   getScanTrends(userId: string, days?: number): Promise<{ date: string; scans: number }[]>;
   getRecentScanActivity(userId: string, limit?: number): Promise<any[]>;
+  getPublicStats(): Promise<{
+    totalQRCodes: number;
+    totalScans: number;
+    totalUsers: number;
+    scansToday: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -359,6 +365,44 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
 
     return result;
+  }
+
+  async getPublicStats(): Promise<{
+    totalQRCodes: number;
+    totalScans: number;
+    totalUsers: number;
+    scansToday: number;
+  }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get total QR codes
+    const [totalQRCodesResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(qrCodes);
+    
+    // Get total scans
+    const [totalScansResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(qrScans);
+    
+    // Get total users
+    const [totalUsersResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(users);
+    
+    // Get scans today
+    const [scansTodayResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(qrScans)
+      .where(gte(qrScans.scannedAt, today));
+    
+    return {
+      totalQRCodes: totalQRCodesResult.count || 0,
+      totalScans: totalScansResult.count || 0,
+      totalUsers: totalUsersResult.count || 0,
+      scansToday: scansTodayResult.count || 0,
+    };
   }
 
   private generateShortCode(): string {

@@ -418,6 +418,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public statistics endpoint
+  app.get('/api/public/stats', async (req, res) => {
+    try {
+      const stats = await storage.getPublicStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching public stats:", error);
+      res.status(500).json({ message: "Failed to fetch statistics" });
+    }
+  });
+
   // Health check endpoint
   app.get('/health', (req, res) => {
     res.status(200).json({ 
