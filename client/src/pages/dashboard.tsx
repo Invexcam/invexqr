@@ -9,7 +9,7 @@ import Analytics from "@/components/dashboard/analytics";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bell, Plus } from "lucide-react";
-import CreateQRModal from "@/components/dashboard/create-qr-modal";
+import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
 import { useState } from "react";
 
 export default function Dashboard() {

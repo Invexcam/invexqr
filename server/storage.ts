@@ -290,7 +290,8 @@ export class DatabaseStorage implements IStorage {
         count: count(),
       })
       .from(qrScans)
-      .where(sql`${qrScans.qrCodeId} = ANY(${qrCodeIds})`)
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
+      .where(eq(qrCodes.userId, userId))
       .groupBy(qrScans.country)
       .orderBy(desc(count()))
       .limit(10);

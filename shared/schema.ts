@@ -44,6 +44,10 @@ export const qrCodes = pgTable("qr_codes", {
   originalUrl: text("original_url").notNull(),
   shortCode: varchar("short_code").notNull().unique(),
   type: varchar("type").notNull(), // 'static' or 'dynamic'
+  contentType: varchar("content_type").notNull().default("url"), // 'url', 'text', 'vcard', 'phone', 'sms', 'email', 'pdf', 'menu', 'audio'
+  content: jsonb("content"), // Structured content for different types
+  style: jsonb("style").default({}), // QR code styling: colors, logo, pattern
+  customization: jsonb("customization").default({}), // Advanced customization options
   description: text("description"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
