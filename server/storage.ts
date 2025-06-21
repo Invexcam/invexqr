@@ -40,6 +40,8 @@ export interface IStorage {
   getTopPerformingQRCodes(userId: string, limit?: number): Promise<(QRCode & { scanCount: number })[]>;
   getDeviceBreakdown(userId: string): Promise<{ deviceType: string; count: number }[]>;
   getLocationBreakdown(userId: string): Promise<{ country: string; count: number }[]>;
+  getScanTrends(userId: string, days?: number): Promise<{ date: string; scans: number }[]>;
+  getRecentScanActivity(userId: string, limit?: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -300,6 +302,63 @@ export class DatabaseStorage implements IStorage {
       country: row.country || 'Unknown',
       count: Number(row.count),
     }));
+  }
+
+  async getScanTrends(userId: string, days: number = 7): Promise<{ date: string; scans: number }[]> {
+    const result = await db
+      .select({
+        date: sql<string>`DATE(${qrScans.scannedAt}) as date`,
+        scans: count(),
+      })
+      .from(qrScans)
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
+      .where(
+        and(
+          eq(qrCodes.userId, userId),
+          gte(qrScans.scannedAt, sql`NOW() - INTERVAL '${sql.raw(days.toString())} days'`)
+        )
+      )
+      .groupBy(sql`DATE(${qrScans.scannedAt})`)
+      .orderBy(sql`DATE(${qrScans.scannedAt})`);
+
+    // Fill in missing dates with 0 scans
+    const trends: { date: string; scans: number }[] = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const existingData = result.find(r => r.date === dateStr);
+      trends.push({
+        date: dateStr,
+        scans: existingData ? Number(existingData.scans) : 0
+      });
+    }
+
+    return trends;
+  }
+
+  async getRecentScanActivity(userId: string, limit: number = 10): Promise<any[]> {
+    const result = await db
+      .select({
+        id: qrScans.id,
+        qrCodeName: qrCodes.name,
+        qrCodeId: qrCodes.id,
+        deviceType: qrScans.deviceType,
+        country: qrScans.country,
+        city: qrScans.city,
+        scannedAt: qrScans.scannedAt,
+        ipAddress: qrScans.ipAddress
+      })
+      .from(qrScans)
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
+      .where(eq(qrCodes.userId, userId))
+      .orderBy(desc(qrScans.scannedAt))
+      .limit(limit);
+
+    return result;
   }
 
   private generateShortCode(): string {

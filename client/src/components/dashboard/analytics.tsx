@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Smartphone, Monitor, Tablet } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 
 export default function Analytics() {
   const { data: deviceBreakdown, isLoading: deviceLoading } = useQuery({
@@ -15,6 +16,14 @@ export default function Analytics() {
 
   const { data: overview } = useQuery({
     queryKey: ["/api/analytics/overview"],
+  });
+
+  const { data: scanTrends, isLoading: trendsLoading } = useQuery({
+    queryKey: ["/api/analytics/scan-trends"],
+  });
+
+  const { data: recentActivity, isLoading: activityLoading } = useQuery({
+    queryKey: ["/api/analytics/recent-activity"],
   });
 
   const getDeviceIcon = (deviceType: string) => {
@@ -64,11 +73,50 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <img 
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=300" 
-                alt="Analytics chart" 
-                className="w-full h-64 object-cover rounded-lg" 
-              />
+              {trendsLoading ? (
+                <Skeleton className="w-full h-64" />
+              ) : (
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={scanTrends || []}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => {
+                          const date = new Date(value);
+                          return date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
+                        }}
+                      />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip 
+                        labelFormatter={(value) => {
+                          const date = new Date(value);
+                          return date.toLocaleDateString('fr-FR', { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          });
+                        }}
+                        formatter={(value) => [value, 'Scans']}
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--background))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="scans" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2}
+                        dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="p-3 bg-muted rounded-lg">
                   <div className="text-lg font-bold text-foreground">
@@ -80,13 +128,13 @@ export default function Analytics() {
                   <div className="text-lg font-bold text-foreground">
                     {overview?.scansToday || "0"}
                   </div>
-                  <div className="text-xs text-muted-foreground">Today</div>
+                  <div className="text-xs text-muted-foreground">Aujourd'hui</div>
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
                   <div className="text-lg font-bold text-foreground">
                     {Math.round((overview?.scansToday || 0) / 24)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Avg/Hour</div>
+                  <div className="text-xs text-muted-foreground">Moy/Heure</div>
                 </div>
               </div>
             </div>
@@ -202,12 +250,57 @@ export default function Analytics() {
           <CardTitle>Recent Scan Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8">
-            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-xl">📊</span>
+          {activityLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-muted rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <Skeleton className="w-8 h-8 rounded-full" />
+                    <div>
+                      <Skeleton className="h-4 w-32 mb-1" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              ))}
             </div>
-            <p className="text-muted-foreground">Detailed scan timeline coming soon</p>
-          </div>
+          ) : recentActivity && recentActivity.length > 0 ? (
+            <div className="space-y-4">
+              {recentActivity.map((activity: any) => (
+                <div key={activity.id} className="flex items-center justify-between p-4 bg-muted rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      {getDeviceIcon(activity.deviceType)}
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">
+                        {activity.qrCodeName}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {activity.country || 'Unknown'} • {activity.deviceType}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {new Date(activity.scannedAt).toLocaleDateString('fr-FR', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl">📊</span>
+              </div>
+              <p className="text-muted-foreground">Aucune activité récente</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

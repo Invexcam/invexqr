@@ -354,6 +354,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/analytics/scan-trends', authenticateUser as any, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const days = parseInt(req.query.days as string) || 7;
+      const trends = await storage.getScanTrends(userId, days);
+      res.json(trends);
+    } catch (error) {
+      console.error("Error fetching scan trends:", error);
+      res.status(500).json({ message: "Failed to fetch scan trends" });
+    }
+  });
+
+  app.get('/api/analytics/recent-activity', authenticateUser as any, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const activity = await storage.getRecentScanActivity(userId, limit);
+      res.json(activity);
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      res.status(500).json({ message: "Failed to fetch recent activity" });
+    }
+  });
+
   // QR code specific analytics
   app.get('/api/analytics/qr/:id/scans', authenticateUser as any, async (req: any, res) => {
     try {
