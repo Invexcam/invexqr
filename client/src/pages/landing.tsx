@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QrCode, BarChart3, Link, Palette, Shield, Code } from "lucide-react";
 import AuthModal from "@/components/auth/auth-modal";
-import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
+import PublicQRGenerator from "@/components/public-qr-generator";
 
 export default function Landing() {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -223,10 +223,9 @@ export default function Landing() {
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
       
       {/* Create QR Modal */}
-      <EnhancedCreateQRModal 
+      <PublicQRGenerator 
         open={showCreateQR} 
         onOpenChange={setShowCreateQR}
-        editMode={false}
       />
     </div>
   );
