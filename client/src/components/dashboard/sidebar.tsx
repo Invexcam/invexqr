@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { QrCode, BarChart3, Settings, Home, LogOut } from "lucide-react";
+import { QrCode, BarChart3, Settings, Home, LogOut, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { logOut } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
@@ -66,18 +66,23 @@ export default function Sidebar({ currentView }: SidebarProps) {
       </nav>
       
       <div className="absolute bottom-6 left-6 right-6 space-y-4">
-        {/* Upgrade Card */}
-        <div className="gradient-primary p-4 rounded-xl text-white">
-          <h4 className="font-semibold mb-1">Upgrade to Pro</h4>
-          <p className="text-sm opacity-90 mb-3">Unlock unlimited QR codes and advanced analytics</p>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="w-full bg-white text-primary hover:bg-gray-100"
-          >
-            Upgrade Now
-          </Button>
-        </div>
+        {/* Premium Subscription Card */}
+        <Link href="/subscription">
+          <div className="gradient-primary p-4 rounded-xl text-white cursor-pointer hover:opacity-90 transition-opacity">
+            <div className="flex items-center mb-2">
+              <Crown className="w-5 h-5 mr-2" />
+              <h4 className="font-semibold">InvexQR Premium</h4>
+            </div>
+            <p className="text-sm opacity-90 mb-3">Accédez à toutes les fonctionnalités avancées</p>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="w-full bg-white text-primary hover:bg-gray-100"
+            >
+              29,99€/mois
+            </Button>
+          </div>
+        </Link>
         
         {/* Logout Button */}
         <Button 

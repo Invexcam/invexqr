@@ -79,6 +79,24 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUserSubscription(userId: string, subscription: {
+    subscriptionId: string;
+    subscriptionStatus: string;
+    subscriptionPlanId: string;
+  }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        subscriptionId: subscription.subscriptionId,
+        subscriptionStatus: subscription.subscriptionStatus,
+        subscriptionPlanId: subscription.subscriptionPlanId,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
   // QR Code operations
   async getUserQRCodes(userId: string): Promise<QRCode[]> {
     return await db
