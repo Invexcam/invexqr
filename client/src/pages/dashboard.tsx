@@ -1,20 +1,23 @@
 import { useParams } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/dashboard/sidebar";
 import Overview from "@/components/dashboard/overview";
 import QRCodes from "@/components/dashboard/qr-codes";
 import Analytics from "@/components/dashboard/analytics";
+import PremiumFeatureGate from "@/components/PremiumFeatureGate";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bell, Plus } from "lucide-react";
+import { Bell, Plus, Crown } from "lucide-react";
 import EnhancedCreateQRModal from "@/components/dashboard/enhanced-create-qr-modal";
 import { useState } from "react";
 
 export default function Dashboard() {
   const { view = "overview" } = useParams();
   const { user, isLoading, isAuthenticated } = useAuth();
+  const { hasActiveSubscription } = useSubscription();
   const { toast } = useToast();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -58,15 +61,34 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (view) {
       case "qr-codes":
-        return <QRCodes onCreateClick={() => setShowCreateModal(true)} />;
+        return (
+          <PremiumFeatureGate 
+            feature="Gestion QR Codes"
+            description="La gestion avancée des QR codes est disponible avec l'abonnement premium."
+          >
+            <QRCodes onCreateClick={() => setShowCreateModal(true)} />
+          </PremiumFeatureGate>
+        );
       case "analytics":
-        return <Analytics />;
+        return (
+          <PremiumFeatureGate 
+            feature="Analytics Avancés"
+            description="Les analyses détaillées et statistiques sont réservées aux abonnés premium."
+          >
+            <Analytics />
+          </PremiumFeatureGate>
+        );
       case "settings":
         return (
-          <div className="bg-white rounded-2xl shadow-sm border p-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Settings</h3>
-            <p className="text-muted-foreground">Settings functionality will be implemented here.</p>
-          </div>
+          <PremiumFeatureGate 
+            feature="Paramètres Avancés"
+            description="La configuration avancée est disponible avec l'abonnement premium."
+          >
+            <div className="bg-white rounded-2xl shadow-sm border p-8">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Settings</h3>
+              <p className="text-muted-foreground">Settings functionality will be implemented here.</p>
+            </div>
+          </PremiumFeatureGate>
         );
       default:
         return <Overview onCreateClick={() => setShowCreateModal(true)} />;

@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import PremiumFeatureGate from "@/components/PremiumFeatureGate";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Contact from "@/pages/contact";
@@ -26,7 +28,14 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard/:view?" component={Dashboard} />
-          <Route path="/contact" component={Contact} />
+          <Route path="/contact">
+            <PremiumFeatureGate 
+              feature="Contact Support"
+              description="Le support client prioritaire est réservé aux abonnés premium."
+            >
+              <Contact />
+            </PremiumFeatureGate>
+          </Route>
           <Route path="/subscription" component={Subscription} />
         </>
       )}

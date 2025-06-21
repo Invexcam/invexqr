@@ -7,59 +7,11 @@ interface PayPalButtonProps {
 }
 
 export default function PayPalButton({ onSubscriptionSuccess }: PayPalButtonProps) {
-  const [paypalLoaded, setPaypalLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const handleDirectPayPal = () => {
     // Direct PayPal subscription link - safer approach
     const subscriptionUrl = `https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-4F775898EU1340713NBLITJI`;
     window.open(subscriptionUrl, '_blank');
   };
-
-  useEffect(() => {
-    // Check if PayPal SDK is available
-    if (typeof (window as any).paypal !== 'undefined') {
-      setPaypalLoaded(true);
-    } else {
-      // Set a timeout to check again
-      const timer = setTimeout(() => {
-        if (typeof (window as any).paypal !== 'undefined') {
-          setPaypalLoaded(true);
-        } else {
-          setError('PayPal SDK non disponible');
-        }
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  if (error) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center text-sm text-red-600 mb-4">
-          Problème de chargement PayPal
-        </div>
-        <Button 
-          onClick={handleDirectPayPal}
-          className="w-full bg-[#0070ba] hover:bg-[#003087] text-white"
-        >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          S'abonner via PayPal
-        </Button>
-        <div className="text-center">
-          <Button 
-            onClick={() => window.location.href = '/pricing'} 
-            variant="outline"
-            className="text-sm"
-          >
-            <Crown className="w-4 h-4 mr-2" />
-            Voir tous les détails
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
