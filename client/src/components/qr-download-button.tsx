@@ -44,18 +44,18 @@ export default function QRDownloadButton({ qrCode }: QRDownloadButtonProps) {
           light: qrCode.style?.backgroundColor || '#FFFFFF',
         },
         errorCorrectionLevel: qrCode.style?.errorCorrection || 'M',
-        style: qrCode.style?.pattern || 'default',
       };
 
       let dataURL: string;
       let filename = qrCode.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      
+
       if (format === 'png') {
         dataURL = await generateQRCodeDataURL(content, options);
         filename += '.png';
       } else {
-        const svgContent = await generateQRCodeSVG(content, options);
-        dataURL = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+        const svgString = await generateQRCodeSVG(content, options);
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        dataURL = URL.createObjectURL(blob);
         filename += '.svg';
       }
 
