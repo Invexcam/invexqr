@@ -108,13 +108,13 @@ export default function Contact() {
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-4">
-              Message envoyé avec succès !
+              Message sent successfully!
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Merci pour votre message. Notre équipe vous répondra dans les plus brefs délais.
+              Thank you for your message. Our team will respond to you as soon as possible.
             </p>
             <Button onClick={() => window.location.href = "/"} size="lg">
-              Retour à l'accueil
+              Back to Home
             </Button>
           </div>
         </div>
@@ -136,10 +136,10 @@ export default function Contact() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="/" className="text-muted-foreground hover:text-primary transition-colors">
-                Accueil
+                Home
               </a>
               <a href="/#features" className="text-muted-foreground hover:text-primary transition-colors">
-                Fonctionnalités
+                Features
               </a>
               <a href="/contact" className="text-primary font-medium">
                 Contact
@@ -153,11 +153,11 @@ export default function Contact() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Contactez-nous
+            Contact Us
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Notre équipe est là pour vous aider. Que vous ayez des questions sur nos services,
-            besoin d'assistance technique ou souhaitiez discuter d'un partenariat, n'hésitez pas à nous contacter.
+            Our team is here to help you. Whether you have questions about our services,
+            need technical assistance or want to discuss a partnership, feel free to contact us.
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export default function Contact() {
           <div className="space-y-8">
             <Card>
               <CardHeader>
-                <CardTitle>Informations de contact</CardTitle>
+                <CardTitle>Contact Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -185,7 +185,7 @@ export default function Contact() {
                     <Phone className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Téléphone</h3>
+                    <h3 className="font-semibold text-foreground mb-1">Phone</h3>
                     <p className="text-muted-foreground">+237 6XX XXX XXX</p>
                     <p className="text-muted-foreground">+237 2XX XXX XXX</p>
                   </div>
@@ -196,10 +196,10 @@ export default function Contact() {
                     <MapPin className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Adresse</h3>
+                    <h3 className="font-semibold text-foreground mb-1">Address</h3>
                     <p className="text-muted-foreground">
-                      Douala, Cameroun<br />
-                      Yaoundé, Cameroun
+                      Douala, Cameroon<br />
+                      Yaoundé, Cameroon
                     </p>
                   </div>
                 </div>
@@ -250,17 +250,17 @@ export default function Contact() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Envoyez-nous un message</CardTitle>
+                <CardTitle>Send us a message</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">Prénom *</Label>
+                      <Label htmlFor="firstName">First Name *</Label>
                       <Input
                         id="firstName"
                         {...form.register("firstName")}
-                        placeholder="Votre prénom"
+                        placeholder="Your first name"
                       />
                       {form.formState.errors.firstName && (
                         <p className="text-sm text-red-500 mt-1">
@@ -269,11 +269,11 @@ export default function Contact() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Nom *</Label>
+                      <Label htmlFor="lastName">Last Name *</Label>
                       <Input
                         id="lastName"
                         {...form.register("lastName")}
-                        placeholder="Votre nom"
+                        placeholder="Your last name"
                       />
                       {form.formState.errors.lastName && (
                         <p className="text-sm text-red-500 mt-1">
