@@ -114,6 +114,8 @@ type CreateQRFormData = z.infer<typeof createQRSchema>;
 interface EnhancedCreateQRModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editMode?: boolean;
+  initialData?: any;
 }
 
 const contentTypeOptions = [
@@ -137,14 +139,28 @@ const styleOptions = [
   { value: "classic", label: "Classic", description: "Traditional style" },
 ];
 
-export default function EnhancedCreateQRModal({ open, onOpenChange }: EnhancedCreateQRModalProps) {
-  const [selectedContentType, setSelectedContentType] = useState<string>("url");
+export default function EnhancedCreateQRModal({ open, onOpenChange, editMode = false, initialData }: EnhancedCreateQRModalProps) {
+  const [selectedContentType, setSelectedContentType] = useState<string>(initialData?.contentType || "url");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<CreateQRFormData>({
     resolver: zodResolver(createQRSchema),
-    defaultValues: {
+    defaultValues: editMode && initialData ? {
+      name: initialData.name || "",
+      type: initialData.type || "dynamic",
+      contentType: initialData.contentType || "url",
+      content: initialData.content || {},
+      style: initialData.style || {
+        pattern: "default",
+        primaryColor: "#000000",
+        backgroundColor: "#FFFFFF",
+        size: 256,
+        margin: 2,
+        errorCorrection: "M",
+      },
+      description: initialData.description || "",
+    } : {
       name: "",
       type: "dynamic",
       contentType: "url",
@@ -174,14 +190,18 @@ export default function EnhancedCreateQRModal({ open, onOpenChange }: EnhancedCr
         description: data.description,
       };
       
-      return apiRequest("POST", "/api/qr-codes", qrData);
+      if (editMode && initialData) {
+        return apiRequest("PUT", `/api/qr-codes/${initialData.id}`, qrData);
+      } else {
+        return apiRequest("POST", "/api/qr-codes", qrData);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/qr-codes"] });
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/overview"] });
       toast({
-        title: "QR Code Created",
-        description: "Your QR code has been created successfully.",
+        title: editMode ? "QR Code Updated" : "QR Code Created",
+        description: editMode ? "Your QR code has been updated successfully." : "Your QR code has been created successfully.",
       });
       onOpenChange(false);
       form.reset();
@@ -522,9 +542,9 @@ export default function EnhancedCreateQRModal({ open, onOpenChange }: EnhancedCr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Enhanced QR Code</DialogTitle>
+          <DialogTitle>{editMode ? "Modifier QR Code" : "Créer QR Code Avancé"}</DialogTitle>
           <DialogDescription>
-            Generate QR codes with advanced content types and customization options
+            {editMode ? "Modifiez votre QR code dynamique avec des options avancées" : "Générez des QR codes avec des types de contenu et des options de personnalisation avancées"}
           </DialogDescription>
         </DialogHeader>
 
@@ -778,7 +798,10 @@ export default function EnhancedCreateQRModal({ open, onOpenChange }: EnhancedCr
                 Cancel
               </Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Creating..." : "Create QR Code"}
+                {mutation.isPending 
+                  ? (editMode ? "Modification..." : "Création...") 
+                  : (editMode ? "Modifier QR Code" : "Créer QR Code")
+                }
               </Button>
             </div>
           </form>
