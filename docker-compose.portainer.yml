@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   invexqr-app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: invexqr-app
     ports:
       - "3001:3001"
@@ -34,7 +36,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
   invexqr-db:
     image: postgres:15-alpine
@@ -47,7 +49,7 @@ services:
       - invexqr_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - invexqr-net
+      - invexapps_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U invexqr"]
       interval: 10s
@@ -59,5 +61,5 @@ volumes:
     driver: local
 
 networks:
-  invexqr-net:
+  invexapps_net:
     driver: bridge

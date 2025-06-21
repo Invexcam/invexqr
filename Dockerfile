@@ -1,25 +1,4 @@
-# Multi-stage build for Node.js application
-FROM node:18-alpine AS builder
-
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install all dependencies (including dev dependencies)
-RUN npm ci
-
-# Copy source code
-COPY . .
-
-# Build the application
-RUN npm run build
-
-# Production stage
+# Single-stage production build for Node.js application
 FROM node:18-alpine AS production
 
 # Install curl for health checks
@@ -31,13 +10,19 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including dev dependencies needed for production server)
+RUN npm ci --include=dev && npm cache clean --force
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/server ./server
-COPY --from=builder /app/shared ./shared
+# Copy source code
+COPY . .
+
+# Build the application with all dependencies available
+RUN npm run build
+
+# Remove dev dependencies that are not needed for runtime (keep vite for server)
+RUN npm prune --omit=dev --include=optional && \
+    npm install vite@^5.4.19 --save && \
+    npm cache clean --force
 
 # Create necessary directories
 RUN mkdir -p /app/logs
