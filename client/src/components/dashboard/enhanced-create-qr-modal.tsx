@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -143,6 +144,7 @@ export default function EnhancedCreateQRModal({ open, onOpenChange, editMode = f
   const [selectedContentType, setSelectedContentType] = useState<string>(initialData?.contentType || "url");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
   const form = useForm<CreateQRFormData>({
     resolver: zodResolver(createQRSchema),
@@ -193,15 +195,23 @@ export default function EnhancedCreateQRModal({ open, onOpenChange, editMode = f
       if (editMode && initialData) {
         return apiRequest("PUT", `/api/qr-codes/${initialData.id}`, qrData);
       } else {
-        return apiRequest("POST", "/api/qr-codes", qrData);
+        // Use public endpoint for anonymous users, authenticated endpoint for logged-in users
+        const endpoint = isAuthenticated ? "/api/qr-codes" : "/api/public/qr-codes";
+        return apiRequest("POST", endpoint, qrData);
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/qr-codes"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/analytics/overview"] });
+    onSuccess: (response) => {
+      if (isAuthenticated) {
+        queryClient.invalidateQueries({ queryKey: ["/api/qr-codes"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/analytics/overview"] });
+      }
       toast({
         title: editMode ? "QR Code Updated" : "QR Code Created",
-        description: editMode ? "Your QR code has been updated successfully." : "Your QR code has been created successfully.",
+        description: editMode 
+          ? "Your QR code has been updated successfully." 
+          : isAuthenticated 
+            ? "Your QR code has been created successfully." 
+            : "Your QR code has been created! Sign up to save and manage your QR codes.",
       });
       onOpenChange(false);
       form.reset();
