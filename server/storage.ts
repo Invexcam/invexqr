@@ -10,7 +10,7 @@ import {
   type InsertQRScan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql, and, gte, count } from "drizzle-orm";
+import { eq, desc, sql, and, gte, count, inArray } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -174,23 +174,29 @@ export class DatabaseStorage implements IStorage {
       .from(qrCodes)
       .where(eq(qrCodes.userId, userId));
 
-    const [totalScansResult] = await db
+    const totalScansResult = await db
       .select({ count: count() })
       .from(qrScans)
-      .where(sql`${qrScans.qrCodeId} = ANY(${qrCodeIds})`);
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
+      .where(eq(qrCodes.userId, userId));
+    
+    const totalScans = totalScansResult[0]?.count || 0;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [scansTodayResult] = await db
+    const scansTodayResult = await db
       .select({ count: count() })
       .from(qrScans)
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
       .where(
         and(
-          sql`${qrScans.qrCodeId} = ANY(${qrCodeIds})`,
+          eq(qrCodes.userId, userId),
           gte(qrScans.scannedAt, today)
         )
       );
+    
+    const scansToday = scansTodayResult[0]?.count || 0;
 
     const [activeQRCodesResult] = await db
       .select({ count: count() })
@@ -204,8 +210,8 @@ export class DatabaseStorage implements IStorage {
 
     return {
       totalQRCodes: totalQRCodesResult?.count || 0,
-      totalScans: totalScansResult?.count || 0,
-      scansToday: scansTodayResult?.count || 0,
+      totalScans,
+      scansToday,
       activeQRCodes: activeQRCodesResult?.count || 0,
     };
   }
@@ -256,7 +262,8 @@ export class DatabaseStorage implements IStorage {
         count: count(),
       })
       .from(qrScans)
-      .where(sql`${qrScans.qrCodeId} = ANY(${qrCodeIds})`)
+      .innerJoin(qrCodes, eq(qrScans.qrCodeId, qrCodes.id))
+      .where(eq(qrCodes.userId, userId))
       .groupBy(qrScans.deviceType);
 
     return result.map(row => ({
