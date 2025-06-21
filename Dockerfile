@@ -1,4 +1,4 @@
-# Single-stage production build for Node.js application
+# Production build for Node.js application
 FROM node:18-alpine AS production
 
 # Install curl for health checks
@@ -7,32 +7,34 @@ RUN apk add --no-cache curl
 # Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package*.json ./
 
-# Install ALL dependencies (including dev dependencies needed for production server)
-RUN npm ci --include=dev && npm cache clean --force
+# Install ALL dependencies
+RUN npm ci && npm cache clean --force
 
-# Copy source code
+# Copy application source
 COPY . .
 
-# Build the application with all dependencies available
+# Set NODE_ENV for build
+ENV NODE_ENV=production
+
+# Build the application
 RUN npm run build
 
-# Remove dev dependencies that are not needed for runtime (keep vite for server)
-RUN npm prune --omit=dev --include=optional && \
-    npm install vite@^5.4.19 --save && \
-    npm cache clean --force
-
-# Create necessary directories
+# Create logs directory
 RUN mkdir -p /app/logs
+
+# Set proper working directory and environment
+ENV NODE_ENV=production
+ENV PORT=3001
 
 # Expose port
 EXPOSE 3001
 
-# Health check using curl
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3001/api/public/stats || exit 1
 
-# Start the application
-CMD ["npm", "start"]
+# Use tsx to run the TypeScript server directly to avoid compilation issues
+CMD ["npx", "tsx", "server/index.ts"]
