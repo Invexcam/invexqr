@@ -144,7 +144,7 @@ export default function Dashboard() {
       </div>
 
       {/* Create QR Modal */}
-      <CreateQRModal 
+      <EnhancedCreateQRModal 
         open={showCreateModal} 
         onOpenChange={setShowCreateModal}
       />

@@ -78,17 +78,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/qr-codes', authenticateUser as any, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      const validatedData = insertQRCodeSchema.parse(req.body);
       
-      const qrCode = await storage.createQRCode(userId, validatedData);
+      // Enhanced QR code data with new fields
+      const qrData = {
+        name: req.body.name,
+        originalUrl: req.body.originalUrl,
+        type: req.body.type || 'dynamic',
+        contentType: req.body.contentType || 'url',
+        content: req.body.content || {},
+        style: req.body.style || {},
+        customization: req.body.customization || {},
+        description: req.body.description,
+      };
+      
+      const qrCode = await storage.createQRCode(userId, qrData);
       res.status(201).json(qrCode);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid data", errors: error.errors });
-      } else {
-        console.error("Error creating QR code:", error);
-        res.status(500).json({ message: "Failed to create QR code" });
-      }
+      console.error("Error creating QR code:", error);
+      res.status(500).json({ message: "Failed to create QR code" });
     }
   });
 
