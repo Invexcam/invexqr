@@ -68,3 +68,20 @@ export const resetPassword = async (email: string) => {
 export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };
+
+// Firebase Reset Authentication Function
+export const resetFirebaseAuth = async () => {
+  const auth = getAuth(app); // Récupère le module d'auth depuis l'app initialisée
+
+  return signInWithEmailAndPassword(auth, "user@example.com", "motdepasse123")
+    .then((userCredential) => {
+      // Connexion réussie
+      const user = userCredential.user;
+      console.log("Connecté :", user.email);
+      return { user, error: null };
+    })
+    .catch((error) => {
+      console.error("Erreur de connexion :", error.code, error.message);
+      return { user: null, error: error.message };
+    });
+};
