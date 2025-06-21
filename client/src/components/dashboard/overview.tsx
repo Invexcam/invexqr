@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { QrCode, MousePointer, Calendar, TrendingUp, ExternalLink } from "lucide-react";
+import { QrCode, MousePointer, Calendar, TrendingUp, ExternalLink, Sun, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import QRCodeDisplay from "@/components/ui/qr-code-display";
 import { useLocation } from "wouter";
@@ -12,6 +13,7 @@ interface OverviewProps {
 }
 
 export default function Overview({ onCreateClick }: OverviewProps) {
+  const { user } = useAuth();
   const [, setLocation] = useLocation();
   
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
@@ -103,8 +105,39 @@ export default function Overview({ onCreateClick }: OverviewProps) {
     );
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Bon matin";
+    if (hour < 17) return "Bon après-midi";
+    return "Bonsoir";
+  };
+
+  const getUserDisplayName = () => {
+    if ((user as any)?.firstName && (user as any)?.lastName) {
+      return `${(user as any).firstName} ${(user as any).lastName}`;
+    }
+    return (user as any)?.email?.split('@')[0] || "Utilisateur";
+  };
+
   return (
     <div className="space-y-8">
+      {/* Welcome Message */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border">
+        <div className="flex items-center space-x-3 mb-2">
+          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            {new Date().getHours() < 12 ? <Sun className="w-5 h-5 text-primary" /> : <Clock className="w-5 h-5 text-primary" />}
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">
+              {getGreeting()}, {getUserDisplayName()} !
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Voici un aperçu de vos QR codes et performances
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
         <Card>
