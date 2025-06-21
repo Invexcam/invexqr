@@ -174,9 +174,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analytics routes
-  app.get('/api/analytics/overview', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/overview', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const analytics = await storage.getUserAnalytics(userId);
       res.json(analytics);
     } catch (error) {
@@ -185,9 +185,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/analytics/top-performing', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/top-performing', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const limit = parseInt(req.query.limit as string) || 5;
       const topQRCodes = await storage.getTopPerformingQRCodes(userId, limit);
       res.json(topQRCodes);
@@ -197,9 +197,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/analytics/device-breakdown', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/device-breakdown', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const breakdown = await storage.getDeviceBreakdown(userId);
       res.json(breakdown);
     } catch (error) {
@@ -208,9 +208,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/analytics/location-breakdown', isAuthenticated, async (req: any, res) => {
+  app.get('/api/analytics/location-breakdown', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const breakdown = await storage.getLocationBreakdown(userId);
       res.json(breakdown);
     } catch (error) {
@@ -219,10 +219,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/:id/scans', isAuthenticated, async (req: any, res) => {
+  app.get('/api/qr-codes/:id/scans', authenticateUser as any, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if QR code belongs to user
       const qrCode = await storage.getQRCode(id);
