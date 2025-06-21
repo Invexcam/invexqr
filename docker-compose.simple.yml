@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  invexqr-app:
+    build: .
+    container_name: invexqr-app
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://invexqr:invexqr2024@invexqr-db:5432/invexqr
+      - SESSION_SECRET=invexqr_session_secret_2024_secure_key_minimum_32_chars
+      - REPL_ID=your_replit_app_id
+      - REPLIT_DOMAINS=207.180.239.163:3001,invexqr.com
+      - ISSUER_URL=https://replit.com/oidc
+      - SMTP_HOST=mail.infomaniak.com
+      - SMTP_PORT=587
+      - SMTP_SECURE=false
+      - SMTP_USER=contact@invexqr.com
+      - SMTP_PASS=your_smtp_password
+      - EMAIL_FROM=contact@invexqr.com
+      - VITE_FIREBASE_API_KEY=your_firebase_key
+      - VITE_FIREBASE_PROJECT_ID=your_firebase_project
+      - VITE_FIREBASE_APP_ID=your_firebase_app_id
+    depends_on:
+      invexqr-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - invexqr-net
+
+  invexqr-db:
+    image: postgres:15-alpine
+    container_name: invexqr-db
+    environment:
+      - POSTGRES_DB=invexqr
+      - POSTGRES_USER=invexqr
+      - POSTGRES_PASSWORD=invexqr2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - invexqr_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - invexqr-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invexqr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  invexqr_data:
+
+networks:
+  invexqr-net:
+    driver: bridge
