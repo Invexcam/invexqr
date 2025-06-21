@@ -12,13 +12,13 @@ import { QrCode, Mail, Phone, MapPin, Clock, Send, CheckCircle } from "lucide-re
 import { useToast } from "@/hooks/use-toast";
 
 const contactSchema = z.object({
-  firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
-  lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  email: z.string().email("Adresse email invalide"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   company: z.string().optional(),
   subject: z.enum(["support", "sales", "partnership", "feedback", "other"]),
-  message: z.string().min(10, "Le message doit contenir au moins 10 caractères"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -49,13 +49,13 @@ export default function Contact() {
       
       setIsSubmitted(true);
       toast({
-        title: "Message envoyé !",
-        description: "Nous vous répondrons dans les plus brefs délais.",
+        title: "Message sent!",
+        description: "We will respond to you as soon as possible.",
       });
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        title: "Error",
+        description: "An error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -65,11 +65,11 @@ export default function Contact() {
 
   const getSubjectLabel = (value: string) => {
     switch (value) {
-      case "support": return "Support technique";
-      case "sales": return "Ventes et tarifs";
-      case "partnership": return "Partenariat";
-      case "feedback": return "Retour d'expérience";
-      case "other": return "Autre";
+      case "support": return "Technical Support";
+      case "sales": return "Sales and Pricing";
+      case "partnership": return "Partnership";
+      case "feedback": return "Feedback";
+      case "other": return "Other";
       default: return "";
     }
   };
@@ -89,10 +89,10 @@ export default function Contact() {
               </div>
               <div className="hidden md:flex items-center space-x-8">
                 <a href="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  Accueil
+                  Home
                 </a>
                 <a href="/#features" className="text-muted-foreground hover:text-primary transition-colors">
-                  Fonctionnalités
+                  Features
                 </a>
                 <a href="/contact" className="text-primary font-medium">
                   Contact

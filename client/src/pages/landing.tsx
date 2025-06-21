@@ -70,19 +70,19 @@ export default function Landing() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-muted-foreground hover:text-primary transition-colors">
-                Fonctionnalités
+                Features
               </a>
               <a href="#pricing" className="text-muted-foreground hover:text-primary transition-colors">
-                Tarifs
+                Pricing
               </a>
               <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                 Contact
               </a>
               <Button variant="ghost" onClick={handleLogin} className="text-primary hover:text-primary/90">
-                Connexion
+                Login
               </Button>
               <Button onClick={handleLogin} className="bg-primary hover:bg-primary/90">
-                Commencer
+                Get Started
               </Button>
             </div>
             <Button variant="ghost" size="icon" className="md:hidden">
@@ -101,21 +101,21 @@ export default function Landing() {
             <div className="space-y-8 animate-slide-up">
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
-                  Générateur de QR Codes
-                  <span className="text-primary"> Dynamiques</span>
-                  avec Statistiques en Temps Réel
+                  Dynamic QR Code
+                  <span className="text-primary"> Generator</span>
+                  with Real-Time Statistics
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Créez, personnalisez et suivez vos QR codes en toute simplicité. Notre solution professionnelle vous permet de générer des QR codes statiques ou dynamiques, avec redirection modifiable et analytics détaillés. Idéale pour les entreprises, commerces, institutions et créateurs en Afrique et à l'international. Plateforme multi-utilisateurs, interface intuitive, données hébergées en toute sécurité.
+                  Create, customize and track your QR codes with ease. Our professional solution allows you to generate static or dynamic QR codes, with modifiable redirection and detailed analytics. Perfect for businesses, commerce, institutions and creators in Africa and internationally. Multi-user platform, intuitive interface, securely hosted data.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button onClick={handleLogin} size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8 py-4">
-                  Essai Gratuit 14 Jours
+                  14-Day Free Trial
                 </Button>
                 <Button onClick={handleCreateQR} variant="outline" size="lg" className="text-lg px-8 py-4">
                   <QrCode className="w-5 h-5 mr-2" />
-                  Générer QR Code Gratuit
+                  Generate Free QR Code
                 </Button>
               </div>
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
@@ -123,13 +123,13 @@ export default function Landing() {
                   <svg className="w-4 h-4 text-secondary mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  Essai gratuit 14 jours
+                  14-day free trial
                 </div>
                 <div className="flex items-center">
                   <svg className="w-4 h-4 text-secondary mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  Aucune carte de crédit requise
+                  No credit card required
                 </div>
               </div>
             </div>
