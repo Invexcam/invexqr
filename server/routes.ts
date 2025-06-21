@@ -74,22 +74,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public QR code creation for visitors
   app.post('/api/public/qr-codes', async (req, res) => {
     try {
-      const generateOriginalUrl = (contentType: string, content: any) => {
+      const generateOriginalUrl = (contentType: string, content: any, shortCode: string) => {
         if (contentType === 'url' && content.url) {
           return content.url;
         }
-        return `${req.protocol}://${req.get('host')}/qr/${Date.now()}`;
+        // For non-URL content types, create a redirect URL through our tracking system
+        return `${req.protocol}://${req.get('host')}/r/${shortCode}`;
       };
 
+      // Generate short code first
+      const shortCode = Math.random().toString(36).substring(2, 8);
+      
       const qrData = {
         name: req.body.name,
-        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content),
+        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content, shortCode),
         type: req.body.type || 'static',
         contentType: req.body.contentType || 'url',
         content: req.body.content || {},
         style: req.body.style || {},
         customization: req.body.customization || {},
         description: req.body.description,
+        shortCode: shortCode,
       };
       
       const qrCode = await storage.createQRCode('anonymous', qrData);
@@ -125,24 +130,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       
-      // Enhanced QR code data with new fields
-      const generateOriginalUrl = (contentType: string, content: any) => {
+      // Generate short code first for authenticated users
+      const shortCode = Math.random().toString(36).substring(2, 8);
+      
+      const generateOriginalUrl = (contentType: string, content: any, shortCode: string) => {
         if (contentType === 'url' && content.url) {
           return content.url;
         }
-        // For non-URL types, create a redirect URL
-        return `${req.protocol}://${req.get('host')}/qr/${Date.now()}`;
+        // For non-URL types, create a redirect URL through our tracking system
+        return `${req.protocol}://${req.get('host')}/r/${shortCode}`;
       };
 
       const qrData = {
         name: req.body.name,
-        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content),
+        originalUrl: req.body.originalUrl || generateOriginalUrl(req.body.contentType, req.body.content, shortCode),
         type: req.body.type || 'dynamic',
         contentType: req.body.contentType || 'url',
         content: req.body.content || {},
         style: req.body.style || {},
         customization: req.body.customization || {},
         description: req.body.description,
+        shortCode: shortCode,
       };
       
       const qrCode = await storage.createQRCode(userId, qrData);
@@ -201,39 +209,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // QR Code redirect and tracking
-  app.get('/qr/:shortCode', async (req, res) => {
+  // QR Code redirect and tracking - Enhanced tracking system
+  app.get('/r/:code', async (req, res) => {
     try {
-      const { shortCode } = req.params;
+      const shortCode = req.params.code;
       const qrCode = await storage.getQRCodeByShortCode(shortCode);
       
-      if (!qrCode || !qrCode.isActive) {
+      if (!qrCode) {
         return res.status(404).send('QR code not found');
       }
       
-      // Record the scan
+      // Check if QR code is active
+      if (qrCode.isActive === false) {
+        return res.status(410).send('QR code is inactive');
+      }
+      
+      // Extract tracking data
       const userAgent = req.headers['user-agent'] || '';
       const ip = req.ip || req.connection.remoteAddress || '';
       const deviceType = getDeviceType(userAgent);
       
-      // Get geolocation data asynchronously
-      const location = await getLocationFromIP(ip);
+      // Bot detection - simple heuristics
+      const isBot = /bot|crawler|spider|scraper|headless|curl|wget/i.test(userAgent) ||
+                   userAgent === '' ||
+                   userAgent.length < 10;
       
-      await storage.recordScan({
-        qrCodeId: qrCode.id,
-        userAgent,
-        ipAddress: ip,
-        country: location.country,
-        city: location.city,
-        deviceType,
-      });
+      // Only record scan if not a bot
+      if (!isBot) {
+        try {
+          // Get geolocation data with timeout
+          const location = await getLocationFromIP(ip);
+          
+          await storage.recordScan({
+            qrCodeId: qrCode.id,
+            userAgent,
+            ipAddress: ip,
+            country: location.country,
+            city: location.city,
+            deviceType,
+          });
+        } catch (scanError) {
+          // Don't fail redirect if scan recording fails
+          console.error("Error recording scan:", scanError);
+        }
+      }
       
-      // Redirect to the original URL
-      res.redirect(qrCode.originalUrl);
+      // Handle different content types with appropriate redirects
+      let redirectUrl = qrCode.originalUrl;
+      
+      if (qrCode.contentType !== 'url' && qrCode.content) {
+        const content = qrCode.content as any;
+        switch (qrCode.contentType) {
+          case 'phone':
+            redirectUrl = `tel:${content.phone || ''}`;
+            break;
+          case 'sms':
+            redirectUrl = `sms:${content.phone || ''}${content.message ? `?body=${encodeURIComponent(content.message)}` : ''}`;
+            break;
+          case 'email':
+            redirectUrl = `mailto:${content.email || ''}${content.subject ? `?subject=${encodeURIComponent(content.subject)}` : ''}`;
+            break;
+          case 'text':
+            // For text content, show it on a simple page
+            return res.send(`
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <title>QR Code Content</title>
+                  <meta name="viewport" content="width=device-width, initial-scale=1">
+                  <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+                    .content { background: #f5f5f5; padding: 20px; border-radius: 8px; white-space: pre-wrap; }
+                  </style>
+                </head>
+                <body>
+                  <h2>QR Code Content</h2>
+                  <div class="content">${content.text || ''}</div>
+                </body>
+              </html>
+            `);
+          default:
+            // Use original URL for other types
+            break;
+        }
+      }
+      
+      // 302 redirect (temporary) to preserve analytics
+      res.redirect(302, redirectUrl);
     } catch (error) {
       console.error("Error processing QR redirect:", error);
       res.status(500).send('Internal server error');
     }
+  });
+
+  // Legacy redirect endpoint for backward compatibility
+  app.get('/qr/:shortCode', async (req, res) => {
+    // Redirect to new format
+    res.redirect(301, `/r/${req.params.shortCode}`);
   });
 
   // Analytics routes
@@ -279,6 +351,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching location breakdown:", error);
       res.status(500).json({ message: "Failed to fetch location breakdown" });
+    }
+  });
+
+  // QR code specific analytics
+  app.get('/api/analytics/qr/:id/scans', authenticateUser as any, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const qrCodeId = parseInt(req.params.id);
+      
+      // Verify QR code belongs to user
+      const qrCode = await storage.getQRCode(qrCodeId);
+      if (!qrCode || qrCode.userId !== userId) {
+        return res.status(404).json({ message: "QR code not found" });
+      }
+      
+      const scans = await storage.getQRCodeScans(qrCodeId);
+      res.json(scans);
+    } catch (error) {
+      console.error("Error fetching QR code scans:", error);
+      res.status(500).json({ message: "Failed to fetch QR code scans" });
     }
   });
 
