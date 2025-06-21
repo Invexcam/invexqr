@@ -12,7 +12,7 @@ export default function PayPalSubscription({ onSubscriptionSuccess }: PayPalSubs
   const isLoaded = useRef(false);
 
   useEffect(() => {
-    if (isLoaded.current) return;
+    if (isLoaded.current || !paypalRef.current) return;
     
     const loadPayPalScript = () => {
       // Check if PayPal SDK is already loaded
@@ -21,11 +21,18 @@ export default function PayPalSubscription({ onSubscriptionSuccess }: PayPalSubs
         return;
       }
 
+      // Remove any existing PayPal scripts first
+      const existingScripts = document.querySelectorAll('script[src*="paypal.com/sdk"]');
+      existingScripts.forEach(script => script.remove());
+
       const script = document.createElement('script');
       script.src = 'https://www.paypal.com/sdk/js?client-id=AaCQHpjm9MDLV7jcIKf9rRyVwL7f1O_RIIsMv0A9n1lH2T15gMyEQYrIps4YSV-sQcsNutjW_tJPj6X2&vault=true&intent=subscription';
       script.setAttribute('data-sdk-integration-source', 'button-factory');
       script.onload = () => {
         renderPayPalButton();
+      };
+      script.onerror = () => {
+        console.error('Failed to load PayPal SDK');
       };
       document.body.appendChild(script);
     };
@@ -33,54 +40,69 @@ export default function PayPalSubscription({ onSubscriptionSuccess }: PayPalSubs
     const renderPayPalButton = () => {
       if (!paypalRef.current || isLoaded.current) return;
       
-      const paypal = (window as any).paypal;
-      
-      paypal.Buttons({
-        style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe',
-          height: 55
-        },
-        createSubscription: function(data: any, actions: any) {
-          return actions.subscription.create({
-            plan_id: 'P-4F775898EU1340713NBLITJI'
-          });
-        },
-        onApprove: function(data: any, actions: any) {
-          console.log('Subscription approved:', data.subscriptionID);
-          
-          // Call success callback if provided
-          if (onSubscriptionSuccess) {
-            onSubscriptionSuccess(data.subscriptionID);
-          }
-          
-          // Show success message
-          alert(`Abonnement activé avec succès ! ID: ${data.subscriptionID}`);
-          
-          // Reload the page to refresh user permissions
-          window.location.reload();
-        },
-        onError: function(err: any) {
-          console.error('PayPal subscription error:', err);
-          alert('Erreur lors de l\'activation de l\'abonnement. Veuillez réessayer.');
-        },
-        onCancel: function(data: any) {
-          console.log('Subscription cancelled:', data);
-          alert('Abonnement annulé.');
+      try {
+        const paypal = (window as any).paypal;
+        if (!paypal) {
+          console.error('PayPal SDK not loaded');
+          return;
         }
-      }).render(paypalRef.current);
-      
-      isLoaded.current = true;
+        
+        // Clear any existing content
+        paypalRef.current.innerHTML = '';
+        
+        paypal.Buttons({
+          style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe',
+            height: 55
+          },
+          createSubscription: function(data: any, actions: any) {
+            return actions.subscription.create({
+              plan_id: 'P-4F775898EU1340713NBLITJI'
+            });
+          },
+          onApprove: function(data: any, actions: any) {
+            console.log('Subscription approved:', data.subscriptionID);
+            
+            // Call success callback if provided
+            if (onSubscriptionSuccess) {
+              onSubscriptionSuccess(data.subscriptionID);
+            }
+            
+            // Show success message
+            alert(`Abonnement activé avec succès ! ID: ${data.subscriptionID}`);
+            
+            // Reload the page to refresh user permissions
+            window.location.reload();
+          },
+          onError: function(err: any) {
+            console.error('PayPal subscription error:', err);
+            alert('Erreur lors de l\'activation de l\'abonnement. Veuillez réessayer.');
+          },
+          onCancel: function(data: any) {
+            console.log('Subscription cancelled:', data);
+            alert('Abonnement annulé.');
+          }
+        }).render(paypalRef.current).catch((error: any) => {
+          console.error('PayPal render error:', error);
+        });
+        
+        isLoaded.current = true;
+      } catch (error) {
+        console.error('PayPal button render error:', error);
+      }
     };
 
     loadPayPalScript();
 
     return () => {
-      // Cleanup: remove script if component unmounts
-      const scripts = document.querySelectorAll('script[src*="paypal.com/sdk"]');
-      scripts.forEach(script => script.remove());
+      // Cleanup function
+      isLoaded.current = false;
+      if (paypalRef.current) {
+        paypalRef.current.innerHTML = '';
+      }
     };
   }, [onSubscriptionSuccess]);
 

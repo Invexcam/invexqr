@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth';
-import PayPalSubscription from '@/components/PayPalSubscription';
+import SimplePayPalButton from '@/components/SimplePayPalButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowLeft } from 'lucide-react';
@@ -117,7 +117,24 @@ export default function Subscription() {
         </div>
 
         {/* Subscription Card */}
-        <PayPalSubscription onSubscriptionSuccess={handleSubscriptionSuccess} />
+        <div className="max-w-md mx-auto">
+          <Card className="relative border-2 border-primary shadow-2xl">
+            <CardHeader className="text-center pt-8">
+              <CardTitle className="text-3xl font-bold">Plan CEO</CardTitle>
+              <div className="text-5xl font-bold text-primary my-4">
+                5$
+                <span className="text-lg text-gray-500 font-normal">/mois</span>
+              </div>
+              <p className="text-gray-600">
+                Toutes les fonctionnalités premium incluses
+              </p>
+            </CardHeader>
+
+            <CardContent className="px-8 pb-8">
+              <SimplePayPalButton onSubscriptionSuccess={handleSubscriptionSuccess} />
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Back to dashboard */}
         <div className="text-center mt-8">
