@@ -284,52 +284,49 @@ export default function QRCodes({ onCreateClick }: QRCodesProps) {
                 <h3 className="font-semibold text-foreground mb-2 truncate" title={qr.name}>
                   {qr.name}
                 </h3>
-                <div className="mb-4">
-                  <p className="text-sm text-muted-foreground truncate" title={qr.originalUrl}>
-                    <span className="font-medium">URL:</span> {qr.originalUrl}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1" title={getQRCodeUrl(qr.shortCode)}>
-                    <span className="font-medium">Tracking:</span> {getQRCodeUrl(qr.shortCode)}
-                  </p>
-                </div>
+                <p className="text-sm text-muted-foreground mb-4 truncate" title={qr.originalUrl}>
+                  {qr.originalUrl}
+                </p>
                 
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-lg font-semibold text-foreground">
-                      {qr.scanCount?.toLocaleString() || 0}
+                <div className="flex items-center justify-between text-sm mb-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-foreground">
+                        {qr.scanCount?.toLocaleString() || 0}
+                      </div>
+                      <div className="text-xs text-muted-foreground">scans</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Scans</div>
-                  </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-sm font-medium text-foreground">
-                      {formatTimeAgo(qr.createdAt)}
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground">
+                        {formatTimeAgo(qr.createdAt)}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Créé</div>
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <Badge 
-                    variant={qr.isActive ? "default" : "secondary"}
-                    className={`cursor-pointer transition-colors ${
-                      qr.isActive 
-                        ? "bg-green-100 text-green-800 hover:bg-green-200" 
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                    onClick={() => toggleStatusMutation.mutate({ 
-                      id: qr.id, 
-                      isActive: !qr.isActive 
-                    })}
-                    title="Cliquer pour changer le statut"
-                  >
-                    {qr.isActive ? "Actif" : "Pausé"}
-                  </Badge>
-                  <Badge 
-                    variant="outline"
-                    className="bg-blue-50 text-blue-700 border-blue-200"
-                  >
-                    {qr.type === "dynamic" ? "Dynamique" : "Statique"}
-                  </Badge>
+                  <div className="flex items-center space-x-2">
+                    <Badge 
+                      variant={qr.isActive ? "default" : "secondary"}
+                      className={`cursor-pointer text-xs ${
+                        qr.isActive 
+                          ? "bg-green-100 text-green-700 hover:bg-green-200" 
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                      onClick={() => toggleStatusMutation.mutate({ 
+                        id: qr.id, 
+                        isActive: !qr.isActive 
+                      })}
+                    >
+                      {qr.isActive ? "Actif" : "Pausé"}
+                    </Badge>
+                    <Badge 
+                      variant="outline"
+                      className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                    >
+                      {qr.type === "dynamic" ? "Dynamique" : "Statique"}
+                    </Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>

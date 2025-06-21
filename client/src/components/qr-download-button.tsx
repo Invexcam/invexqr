@@ -85,9 +85,14 @@ export default function QRDownloadButton({ qrCode }: QRDownloadButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isGenerating}>
-          <Download className="h-4 w-4 mr-2" />
-          {isGenerating ? "Génération..." : "Télécharger"}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          disabled={isGenerating}
+          className="text-muted-foreground hover:text-primary"
+          title="Télécharger le QR code"
+        >
+          <Download className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
