@@ -418,6 +418,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Health check endpoint
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0'
+    });
+  });
+
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
+  // Contact form endpoint
+  app.post('/api/contact', async (req, res) => {
+    try {
+      const { name, email, subject, message } = req.body;
+      
+      if (!name || !email || !subject || !message) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      const emailSent = await emailService.sendContactFormEmail({
+        name,
+        email,
+        subject,
+        message
+      });
+
+      if (emailSent) {
+        res.json({ message: "Message sent successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to send message" });
+      }
+    } catch (error) {
+      console.error("Error sending contact message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  // Email service test endpoint (development only)
+  if (process.env.NODE_ENV === 'development') {
+    app.get('/api/test-email', async (req, res) => {
+      try {
+        const isConnected = await emailService.testConnection();
+        res.json({ connected: isConnected });
+      } catch (error: any) {
+        res.status(500).json({ connected: false, error: error.message });
+      }
+    });
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }
