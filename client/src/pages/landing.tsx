@@ -101,12 +101,12 @@ export default function Landing() {
             <div className="space-y-8 animate-slide-up">
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight text-balance">
-                  Générateur QR Code
-                  <span className="text-primary"> Professionnel</span>
-                  pour le Cameroun
+                  Générateur de QR Codes
+                  <span className="text-primary"> Dynamiques</span>
+                  avec Statistiques en Temps Réel
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Créez des QR codes dynamiques avec analytics en temps réel. Solution professionnelle pour entreprises au Cameroun, en Afrique et dans le monde entier.
+                  Créez, personnalisez et suivez vos QR codes en toute simplicité. Notre solution professionnelle vous permet de générer des QR codes statiques ou dynamiques, avec redirection modifiable et analytics détaillés. Idéale pour les entreprises, commerces, institutions et créateurs en Afrique et à l'international. Plateforme multi-utilisateurs, interface intuitive, données hébergées en toute sécurité.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
