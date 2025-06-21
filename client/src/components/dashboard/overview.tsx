@@ -113,7 +113,9 @@ export default function Overview({ onCreateClick }: OverviewProps) {
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
                 <QrCode className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-secondary text-sm font-medium">+12%</span>
+              <span className="text-green-600 text-sm font-medium">
+                +{Math.round(((analytics?.totalQRCodes || 0) / 30) * 100) || 0}%
+              </span>
             </div>
             <div className="text-2xl font-bold text-foreground mb-1">
               {analytics?.totalQRCodes || 0}
@@ -128,7 +130,9 @@ export default function Overview({ onCreateClick }: OverviewProps) {
               <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
                 <MousePointer className="w-6 h-6 text-secondary" />
               </div>
-              <span className="text-secondary text-sm font-medium">+28%</span>
+              <span className="text-green-600 text-sm font-medium">
+                +{Math.round(((analytics?.totalScans || 0) / (analytics?.totalQRCodes || 1)) * 10) || 0}%
+              </span>
             </div>
             <div className="text-2xl font-bold text-foreground mb-1">
               {analytics?.totalScans?.toLocaleString() || 0}
@@ -143,7 +147,9 @@ export default function Overview({ onCreateClick }: OverviewProps) {
               <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-accent" />
               </div>
-              <span className="text-secondary text-sm font-medium">+8%</span>
+              <span className="text-green-600 text-sm font-medium">
+                +{Math.round(((analytics?.scansToday || 0) / (analytics?.totalScans || 1)) * 100) || 0}%
+              </span>
             </div>
             <div className="text-2xl font-bold text-foreground mb-1">
               {analytics?.scansToday || 0}
@@ -158,7 +164,9 @@ export default function Overview({ onCreateClick }: OverviewProps) {
               <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-warning" />
               </div>
-              <span className="text-secondary text-sm font-medium">+15%</span>
+              <span className="text-green-600 text-sm font-medium">
+                +{Math.round(((analytics?.activeQRCodes || 0) / (analytics?.totalQRCodes || 1)) * 100) || 0}%
+              </span>
             </div>
             <div className="text-2xl font-bold text-foreground mb-1">
               {analytics?.activeQRCodes || 0}
