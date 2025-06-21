@@ -31,16 +31,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', authenticateUser, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/auth/user', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       let user = await storage.getUser(userId);
       
       // If Firebase user doesn't exist in database, create them
-      if (!user && req.user!.authProvider === 'firebase') {
+      if (!user && req.user.authProvider === 'firebase') {
         user = await storage.upsertUser({
           id: userId,
-          email: req.user!.email || null,
+          email: req.user.email || null,
           firstName: null,
           lastName: null,
           profileImageUrl: null,
@@ -55,9 +55,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // QR Code routes
-  app.get('/api/qr-codes', authenticateUser, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/qr-codes', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const qrCodes = await storage.getUserQRCodes(userId);
       
       // Add scan counts to each QR code
@@ -75,9 +75,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/qr-codes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/qr-codes', authenticateUser as any, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const validatedData = insertQRCodeSchema.parse(req.body);
       
       const qrCode = await storage.createQRCode(userId, validatedData);
@@ -92,10 +92,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/qr-codes/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/qr-codes/:id', authenticateUser as any, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if QR code belongs to user
       const existingQR = await storage.getQRCode(id);
@@ -117,10 +117,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/qr-codes/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/qr-codes/:id', authenticateUser as any, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Check if QR code belongs to user
       const existingQR = await storage.getQRCode(id);
