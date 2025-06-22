@@ -24,6 +24,7 @@ function Router() {
           <Route path="/" component={Landing} />
           <Route path="/contact" component={Contact} />
           <Route path="/pricing" component={Pricing} />
+          <Route path="/firebase-test" component={FirebaseTest} />
         </>
       ) : (
         <>
@@ -38,6 +39,7 @@ function Router() {
             </PremiumFeatureGate>
           </Route>
           <Route path="/subscription" component={Subscription} />
+          <Route path="/firebase-test" component={FirebaseTest} />
         </>
       )}
       <Route component={NotFound} />

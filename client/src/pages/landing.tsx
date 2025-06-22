@@ -124,6 +124,9 @@ export default function Landing() {
               <a href="/contact" onClick={handleLinkClick} className="block text-muted-foreground hover:text-primary transition-colors py-2">
                 Contact
               </a>
+              <a href="/firebase-test" onClick={handleLinkClick} className="block text-red-600 hover:text-red-700 transition-colors py-2 text-sm">
+                🔧 Firebase Test
+              </a>
               <div className="pt-2 border-t space-y-2">
                 <Button variant="ghost" onClick={handleLogin} className="w-full justify-start text-primary hover:text-primary/90 h-10">
                   Login
