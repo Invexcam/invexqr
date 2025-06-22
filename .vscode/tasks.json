@@ -1,0 +1,98 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Docker: Build and Start Production",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f", 
+                "docker-compose.production.yml", 
+                "up", 
+                "-d", 
+                "--build"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker: Stop Production",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f", 
+                "docker-compose.production.yml", 
+                "down"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Docker: View Logs",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f", 
+                "docker-compose.production.yml", 
+                "logs", 
+                "-f"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Setup Database",
+            "type": "shell",
+            "command": "./setup-database.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Deploy to VPS",
+            "type": "shell",
+            "command": "./deploy-vps.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Start Application",
+            "type": "shell",
+            "command": "./start.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Start InvexQR Development",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/index.ts",
+            "runtimeArgs": ["--loader", "tsx/esm"],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "name": "Start InvexQR Production",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/dist/index.js",
+            "env": {
+                "NODE_ENV": "production"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        }
+    ]
+}
