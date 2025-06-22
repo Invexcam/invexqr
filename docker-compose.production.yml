@@ -37,9 +37,9 @@ services:
   invexqr-postgres:                    # ✅ Ajout de la base de données dans ce fichier, ou connecte-la via nom de réseau
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: 'invexqr'
-      POSTGRES_USER: 'invexqr_user'
-      POSTGRES_PASSWORD: 'invexqr2025q'
+      POSTGRES_DB: invexqr
+      POSTGRES_USER: invexqr_user
+      POSTGRES_PASSWORD: invexqr2025q
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
