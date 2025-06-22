@@ -11,6 +11,7 @@ import Dashboard from "@/pages/dashboard";
 import Contact from "@/pages/contact";
 import Subscription from "@/pages/subscription";
 import Pricing from "@/pages/pricing";
+import FirebaseTest from "@/pages/firebase-test";
 import NotFound from "@/pages/not-found";
 
 function Router() {
