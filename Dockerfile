@@ -40,6 +40,7 @@ RUN apk add --no-cache \
     curl \
     postgresql-client \
     dumb-init \
+    bash \
     && rm -rf /var/cache/apk/*
 
 # Créer un utilisateur non-root
@@ -58,6 +59,10 @@ COPY --from=builder --chown=invexqr:nodejs /app/dist ./dist
 COPY --from=builder --chown=invexqr:nodejs /app/server ./server
 COPY --from=builder --chown=invexqr:nodejs /app/shared ./shared
 COPY --from=builder --chown=invexqr:nodejs /app/drizzle.config.ts ./
+
+# Copier le script de démarrage
+COPY --chown=invexqr:nodejs start.sh ./start.sh
+RUN chmod +x start.sh
 
 # Créer le répertoire des logs
 RUN mkdir -p /app/logs && chown invexqr:nodejs /app/logs
@@ -80,5 +85,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # Utiliser dumb-init comme PID 1
 ENTRYPOINT ["dumb-init", "--"]
 
-# Commande de démarrage (utiliser tsx pour exécuter TypeScript directement)
-CMD ["npx", "tsx", "server/index.ts"]
+# Commande de démarrage automatisé
+CMD ["./start.sh"]
