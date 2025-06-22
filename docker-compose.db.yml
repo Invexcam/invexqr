@@ -1,13 +1,24 @@
 version: '3.8'
 
 services:
+  app:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://invexqr_user:invexqr2025q@invexqr-postgres:5432/invexqr
+      - NODE_ENV=production
+      - REPLIT_DOMAINS=localhost
+    depends_on:
+      - postgres
+    networks:
+      - invexqr_net
+
   postgres:
     image: postgres:15-alpine
     container_name: invexqr-postgres
     environment:
       POSTGRES_DB: invexqr
       POSTGRES_USER: invexqr_user
-      POSTGRES_PASSWORD: invexqr_secure_password_2024
+      POSTGRES_PASSWORD: invexqr2025q
     ports:
       - "5432:5432"
     volumes:
@@ -19,6 +30,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - invexqr_net
 
 volumes:
   postgres_data:
+
+networks:
+  invexqr_net:
