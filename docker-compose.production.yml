@@ -16,7 +16,7 @@ services:
       - VITE_FIREBASE_API_KEY=AIzaSyAEdlkepge2d3SnlLrpEoJkqv8PAjISfVA
       - VITE_FIREBASE_APP_ID=invextrack-a1001
       - VITE_FIREBASE_PROJECT_ID=1:746716963518:web:0faf49c4b09299ba2a74ef
-      - SESSION_SECRET=${SESSION_SECRET:-invexqr-production-secret-2024}
+      - SESSION_SECRET=I$yXqM7ZfR3!Tq1cWopE8Azz0m2YBkPv
       - REPLIT_DOMAINS=localhost        # ✅ Ajouté pour éviter l'erreur dans index.js
     depends_on:
       - invexqr-postgres               # ✅ S'assurer que PostgreSQL est prêt (si dans le même compose)
