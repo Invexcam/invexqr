@@ -11,7 +11,6 @@ import Dashboard from "@/pages/dashboard";
 import Contact from "@/pages/contact";
 import Subscription from "@/pages/subscription";
 import Pricing from "@/pages/pricing";
-import FirebaseTest from "@/pages/firebase-test";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,7 +23,6 @@ function Router() {
           <Route path="/" component={Landing} />
           <Route path="/contact" component={Contact} />
           <Route path="/pricing" component={Pricing} />
-          <Route path="/firebase-test" component={FirebaseTest} />
         </>
       ) : (
         <>
@@ -39,7 +37,6 @@ function Router() {
             </PremiumFeatureGate>
           </Route>
           <Route path="/subscription" component={Subscription} />
-          <Route path="/firebase-test" component={FirebaseTest} />
         </>
       )}
       <Route component={NotFound} />

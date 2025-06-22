@@ -10,7 +10,7 @@ import {
   type InsertQRScan,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql, and, gte, count, inArray } from "drizzle-orm";
+import { eq, desc, sql, and, gte, count, inArray, or } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -65,18 +65,62 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    try {
+      // Check if user exists by ID first
+      if (userData.id) {
+        const existingUser = await this.getUser(userData.id);
+        if (existingUser) {
+          // Update existing user
+          const [updatedUser] = await db
+            .update(users)
+            .set({
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              profileImageUrl: userData.profileImageUrl,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, userData.id))
+            .returning();
+          return updatedUser;
+        }
+      }
+
+      // Check if user exists by email
+      if (userData.email) {
+        const [existingUserByEmail] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, userData.email))
+          .limit(1);
+        
+        if (existingUserByEmail) {
+          // Update existing user found by email
+          const [updatedUser] = await db
+            .update(users)
+            .set({
+              id: userData.id || existingUserByEmail.id,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              profileImageUrl: userData.profileImageUrl,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.email, userData.email))
+            .returning();
+          return updatedUser;
+        }
+      }
+
+      // Create new user if none exists
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      return newUser;
+    } catch (error) {
+      console.error('Error in upsertUser:', error);
+      throw error;
+    }
   }
 
   async updateUserSubscription(userId: string, subscription: {
