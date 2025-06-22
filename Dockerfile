@@ -50,9 +50,9 @@ RUN addgroup -g 1001 -S nodejs \
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier package.json et installer uniquement les dépendances de production
+# Copier package.json et installer les dépendances
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 # Copier les fichiers compilés depuis le stage builder
 COPY --from=builder --chown=invexqr:nodejs /app/dist ./dist

@@ -13,8 +13,10 @@ if [ "$NODE_ENV" = "production" ]; then
     
     # Install dependencies if node_modules doesn't exist
     if [ ! -d "node_modules" ]; then
-        echo "📥 Installing dependencies..."
+        echo "📥 Installing production dependencies..."
         npm ci --production
+        echo "📥 Installing drizzle-kit for migrations..."
+        npm install drizzle-kit --no-save
     fi
     
     # Build the application if dist doesn't exist
@@ -23,9 +25,17 @@ if [ "$NODE_ENV" = "production" ]; then
         npm run build
     fi
     
-    # Run database migrations
+    # Run database migrations with fallback
     echo "🗄️ Running database migrations..."
-    npm run db:push
+    if [ -f "migrate.js" ]; then
+        node migrate.js || echo "⚠️ Migration failed, continuing with existing schema..."
+    elif [ -f "node_modules/.bin/drizzle-kit" ]; then
+        ./node_modules/.bin/drizzle-kit push || echo "⚠️ Migration failed, continuing with existing schema..."
+    elif command -v npx &> /dev/null; then
+        npx drizzle-kit push || echo "⚠️ Migration failed, continuing with existing schema..."
+    else
+        echo "⚠️ Skipping migrations - migration tools not available"
+    fi
     
     # Start the application
     echo "✅ Starting production server..."
@@ -39,9 +49,17 @@ else
         npm install
     fi
     
-    # Run database migrations
+    # Run database migrations with fallback
     echo "🗄️ Running database migrations..."
-    npm run db:push
+    if [ -f "migrate.js" ]; then
+        node migrate.js || echo "⚠️ Migration failed, continuing with existing schema..."
+    elif [ -f "node_modules/.bin/drizzle-kit" ]; then
+        ./node_modules/.bin/drizzle-kit push || echo "⚠️ Migration failed, continuing with existing schema..."
+    elif command -v npx &> /dev/null; then
+        npx drizzle-kit push || echo "⚠️ Migration failed, continuing with existing schema..."
+    else
+        echo "⚠️ Skipping migrations - migration tools not available"
+    fi
     
     # Start development server
     echo "✅ Starting development server..."
