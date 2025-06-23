@@ -54,19 +54,19 @@ PORT=5000
 HOST=0.0.0.0
 
 # Database Configuration
-DATABASE_URL=your_database_url_here
+DATABASE_URL=postgresql://invexqr_user:invexqr2025q@invexqr-postgres:5432/invexqr
 
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_APP_ID=your_firebase_app_id
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+# Firebase
+VITE_FIREBASE_API_KEY=AIzaSyAEdlkepge2d3SnlLrpEoJkqv8PAjISfVA
+VITE_FIREBASE_APP_ID=invextrack-a1001
+VITE_FIREBASE_PROJECT_ID=1:746716963518:web:0faf49c4b09299ba2a74ef
 
-# Session Secret (generate a secure random string)
-SESSION_SECRET=your_secure_session_secret_here
+# Auth / Session
+SESSION_SECRET=I$yXqM7ZfR3!Tq1cWopE8Azz0m2YBkPv
 
-# PayPal Configuration (optional)
-PAYPAL_CLIENT_ID=your_paypal_client_id
-PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+# PayPal
+PAYPAL_CLIENT_ID=AXu-EpJWDQ7Bl7Z_rQ6llW8QokphIfWfBPeyfv1aHbqQl8wGS5Ak_l6P0YCJtp3r2BYlQn6-zP_MjG7v
+PAYPAL_CLIENT_SECRET=sk_9a8s7df98a7sdf98a7sd9f8a7sd9f87a
 EOF
     print_warning "Please edit .env.production with your actual configuration values"
     print_warning "Then run this script again"
