@@ -6,7 +6,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://invexqr_user:invexqr2025q@invexqr-postgres:5432/invexqr
       - NODE_ENV=production
-      - REPLIT_DOMAINS=localhost
+      - REPLIT_DOMAINS=207.180.239.163:3001,invexqr.com
     depends_on:
       - postgres
     networks:
