@@ -1,178 +1,64 @@
 version: '3.8'
 
 services:
-  # Base de données PostgreSQL
-  postgres:
-    image: postgres:15-alpine
-    container_name: invexqr_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: invexqr
-      POSTGRES_USER: invexqr_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-invexqr_secure_pass}
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    ports:
-      - "5432:5432"
-    networks:
-      - invexapps_net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U invexqr_user -d invexqr"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # Redis pour le cache et les sessions
-  redis:
-    image: redis:7-alpine
-    container_name: invexqr_redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secure_pass}
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    networks:
-      - invexapps_net
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # Application InvexQR
   invexqr:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: invexqr_app
-    restart: unless-stopped
-    environment:
-      # Base de données
-      DATABASE_URL: postgresql://invexqr_user:${POSTGRES_PASSWORD:-invexqr_secure_pass}@postgres:5432/invexqr
-      PGHOST: postgres
-      PGPORT: 5432
-      PGDATABASE: invexqr
-      PGUSER: invexqr_user
-      PGPASSWORD: ${POSTGRES_PASSWORD:-invexqr_secure_pass}
-      
-      # Redis
-      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secure_pass}@redis:6379
-      
-      # Application
-      NODE_ENV: production
-      PORT: 5000
-      SESSION_SECRET: ${SESSION_SECRET:-change_this_in_production_please}
-      
-      # Replit Auth
-      REPL_ID: ${REPL_ID}
-      ISSUER_URL: ${ISSUER_URL:-https://replit.com/oidc}
-      REPLIT_DOMAINS: ${REPLIT_DOMAINS}
-      
-      # Firebase
-      VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
-      VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
-      VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
-      
-      # PayPal
-      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
-      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
-      
-      # Email
-      SMTP_HOST: ${SMTP_HOST:-ssl0.ovh.net}
-      SMTP_PORT: ${SMTP_PORT:-465}
-      SMTP_USER: ${SMTP_USER}
-      SMTP_PASS: ${SMTP_PASS}
-      FROM_EMAIL: ${FROM_EMAIL:-noreply@invexqr.com}
-      FROM_NAME: ${FROM_NAME:-InvexQR}
-      
     ports:
-      - "3000:5000"
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgresql://invexqr_user:invexqr2025q@invexqr-postgres:5432/invexqr
+      - VITE_FIREBASE_API_KEY=AIzaSyAEdlkepge2d3SnlLrpEoJkqv8PAjISfVA
+      - VITE_FIREBASE_APP_ID=invextrack-a1001
+      - VITE_FIREBASE_PROJECT_ID=1:746716963518:web:0faf49c4b09299ba2a74ef
+      - SESSION_SECRET=I$yXqM7ZfR3!Tq1cWopE8Azz0m2YBkPv
+      - PAYPAL_CLIENT_ID=AXu-EpJWDQ7Bl7Z_rQ6llW8QokphIfWfBPeyfv1aHbqQl8wGS5Ak_l6P0YCJtp3r2BYlQn6-zP_MjG7v
+      - PAYPAL_CLIENT_SECRET=sk_9a8s7df98a7sdf98a7sd9f8a7sd9f87a
+      - REPLIT_DOMAINS=localhost
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - invexapps_net
-    volumes:
-      - ./logs:/app/logs
+      - invexqr-postgres
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # Nginx reverse proxy
-  nginx:
-    image: nginx:alpine
-    container_name: invexqr_nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - nginx_logs:/var/log/nginx
-    depends_on:
-      - invexqr
+      - logs:/app/logs
     networks:
-      - invexapps_net
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - invexqr-network
 
-  # Monitoring avec Portainer (optionnel)
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: invexqr_portainer
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - invexapps_net
-    profiles:
-      - monitoring
-
-  # Watchtower pour les mises à jour automatiques (optionnel)
-  watchtower:
-    image: containrrr/watchtower
-    container_name: invexqr_watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  invexqr-postgres:
+    image: postgres:15-alpine
+    container_name: invexqr-postgres
     environment:
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_POLL_INTERVAL: 86400  # 24 heures
-      WATCHTOWER_INCLUDE_STOPPED: "true"
+      POSTGRES_DB: invexqr
+      POSTGRES_USER: invexqr_user
+      POSTGRES_PASSWORD: invexqr2025q
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invexqr_user -d invexqr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - invexapps_net
-    profiles:
-      - monitoring
-
-networks:
-  invexapps_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+      - invexqr-network
 
 volumes:
+  logs:
   postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  nginx_logs:
-    driver: local
-  portainer_data:
-    driver: local
+
+networks:
+  invexqr-network:
+    driver: bridge
